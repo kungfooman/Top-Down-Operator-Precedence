@@ -41,14 +41,10 @@ PrettyPrint(1,2)
 <script src="evaluator.js"></script>
 <script>
 	var calculate = function (input) {
-		try {
-			var tokens = lex(input);
-			var parseTree = parse(tokens);
-			var output = evaluate(parseTree);
-			return output;
-		} catch (e) {
-			return e;
-		}
+		var tokens = lex(input);
+		var parseTree = parse(tokens);
+		var output = evaluate(parseTree);
+		return output;
 	};
 
 	function clear() {
