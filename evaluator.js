@@ -85,7 +85,7 @@ var evaluate = function (parseTree) {
 
 function PrettyPrint(node, depth)
 {
-	indent = "PrettyPrint> " + "  ".repeat(depth);
+	var indent = "PrettyPrint> " + "  ".repeat(depth);
 	
 	switch (node.type) {
 		case "call": {
@@ -95,10 +95,28 @@ function PrettyPrint(node, depth)
 			}
 			break;
 		}
-		case "number": {
+		case "number3": {
 			print(indent + "node.type=" + node.type + " node.value=" + node.value);
 			break;
 		}
+		
+		default:
+			nonewline = function(msg) { return msg.replace(/\r\n/g, " "); }
+			tmp = "";
+			for (key in node) {
+				tmp += key + "=" + node[key] + " ";
+			}
+			tmp = nonewline(tmp);
+			print(indent + "Unhandled type: " + tmp);
+			if (typeof node.left != "undefined") {
+				print(indent + "left node:");
+				PrettyPrint(node.left, depth + 1);
+			}
+			if (typeof node.right != "undefined") {
+				print(indent + "right node:");
+				PrettyPrint(node.right, depth + 1);
+			}
+			break;
 	}
 	
 	//switch (node.type)
