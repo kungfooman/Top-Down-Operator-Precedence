@@ -53,7 +53,14 @@ var evaluate = function (parseTree) {
 			variables[node.name] = parseNode(node.value);
 		}
 		else if (node.type === "call") {
-			for (var i = 0; i < node.args.length; i++) node.args[i] = parseNode(node.args[i]);
+			if (node.name == "PrettyPrint")
+			{
+				//console.log("Some prettyprinter....")
+				PrettyPrint(node, 0);
+				return 1;
+			}
+			for (var i = 0; i < node.args.length; i++)
+				node.args[i] = parseNode(node.args[i]);
 			return functions[node.name].apply(null, node.args);
 		}
 		else if (node.type === "function") {
@@ -75,3 +82,28 @@ var evaluate = function (parseTree) {
 	}
 	return output;
 };
+
+function PrettyPrint(node, depth)
+{
+	indent = "PrettyPrint> " + "  ".repeat(depth);
+	
+	switch (node.type) {
+		case "call": {
+			print(indent + "node.type=" + node.type + " node.name=" + node.name);
+			for (var i = 0; i < node.args.length; i++) {
+				PrettyPrint(node.args[i], depth + 1);
+			}
+			break;
+		}
+		case "number": {
+			print(indent + "node.type=" + node.type + " node.value=" + node.value);
+			break;
+		}
+	}
+	
+	//switch (node.type)
+	//{
+	//
+	//}
+	
+}

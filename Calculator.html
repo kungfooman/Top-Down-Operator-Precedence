@@ -26,6 +26,8 @@ toDegrees(2 * pi)
 
 cylinderVolume(r, h) = pi * r ^ 2 * h
 cylinderVolume(2, 4)
+
+PrettyPrint(1,2)
 				</textarea>
 			<td>
 				<button id="calculate">Calculate</button>
@@ -49,10 +51,17 @@ cylinderVolume(2, 4)
 		}
 	};
 
+	function clear() {
+		document.getElementById("output").innerHTML = "";
+	}
+	function print(msg) {
+		document.getElementById("output").innerHTML += msg + "\n";
+	}
+	
 	document.getElementById("calculate").onclick = function () {
 		var input = document.getElementById("input").value;
 		output = calculate(input);
-		document.getElementById("output").innerHTML = output;
+		print("\nStatement evaluations: \n" + output);
 	};
 </script>
 </body>
