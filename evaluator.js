@@ -88,14 +88,14 @@ function PrettyPrint(node, depth)
 	var indent = "PrettyPrint> " + "  ".repeat(depth);
 	
 	switch (node.type) {
-		case "call": {
+		case "call_": {
 			print(indent + "node.type=" + node.type + " node.name=" + node.name);
 			for (var i = 0; i < node.args.length; i++) {
 				PrettyPrint(node.args[i], depth + 1);
 			}
 			break;
 		}
-		case "number3": {
+		case "number_": {
 			print(indent + "node.type=" + node.type + " node.value=" + node.value);
 			break;
 		}
@@ -104,24 +104,26 @@ function PrettyPrint(node, depth)
 			nonewline = function(msg) { return msg.replace(/\r\n/g, " "); }
 			tmp = "";
 			for (key in node) {
-				tmp += key + "=" + node[key] + " ";
+				if (key == "args" || key == "left" || key == "right") // will be printed separately
+					continue;
+				tmp += "node." + key + "=" + node[key] + " ";
 			}
 			tmp = nonewline(tmp);
-			print(indent + "Unhandled type: " + tmp);
+			print(indent + tmp);
 			if (typeof node.left != "undefined") {
-				print(indent + "left node:");
+				print(indent + "node.left:");
 				PrettyPrint(node.left, depth + 1);
 			}
 			if (typeof node.right != "undefined") {
-				print(indent + "right node:");
+				print(indent + "node.right:");
 				PrettyPrint(node.right, depth + 1);
+			}
+			if (typeof node.args != "undefined") {
+				print(indent + "node.args:");
+				for (var i = 0; i < node.args.length; i++) {
+					PrettyPrint(node.args[i], depth + 1);
+				}
 			}
 			break;
 	}
-	
-	//switch (node.type)
-	//{
-	//
-	//}
-	
 }
