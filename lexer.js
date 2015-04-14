@@ -1,3 +1,14 @@
+
+// PrettyPrinterLex(lex("\"test\""));
+function PrettyPrinterLex(tokens)
+{
+	for (var i=0; i<tokens.length; i++)
+	{
+		t = tokens[i];
+		print("token.type=" + t.type + " token.value=" + t.value);
+	}
+}
+
 var lex = function (input) {
 	var isOperator = function (c) { return /[+\-*\/\^%=(),]/.test(c); },
 		isDigit = function (c) { return /[0-9]/.test(c); },
@@ -12,7 +23,8 @@ var lex = function (input) {
 			value: value
 		});
 	};
-	while (i < input.length) {
+	var charsLeft = function() { return i < input.length; }
+	while (charsLeft()) {
 		c = input[i];
 		if (isWhiteSpace(c)) advance();
 		else if (isOperator(c)) {
@@ -28,6 +40,16 @@ var lex = function (input) {
 			num = parseFloat(num);
 			if (!isFinite(num)) throw "Number is too large or too small for a 64-bit double.";
 			addToken("number", num);
+		}
+		else if (c == "\"") {
+			//print("start string...");
+			var str = "";
+			while (advance() != "\"" && charsLeft()) {
+				//print("c="+c);
+				str += c;
+			}
+			addToken("string", str);
+			advance(); // eat last "
 		}
 		else if (isIdentifier(c)) {
 			var idn = c;

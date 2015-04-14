@@ -60,6 +60,13 @@ var parse = function (tokens) {
 	symbol("number", function (number) {
 		return number;
 	});
+	
+	symbol("string", function (node) {
+		console.log("symbol->string->node: ", node);
+		node.nigga = "plz";
+		return node;
+	});
+	
 	symbol("identifier", function (name) {
 		if (token().type === "(") {
 			var args = [];

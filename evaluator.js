@@ -40,6 +40,9 @@ var evaluate = function (parseTree) {
 
 	var parseNode = function (node) {
 		if (node.type === "number") return node.value;
+		else if (node.type === "string") {
+			return node.value;
+		}
 		else if (operators[node.type]) {
 			if (node.left) return operators[node.type](parseNode(node.left), parseNode(node.right));
 			return operators[node.type](parseNode(node.right));
