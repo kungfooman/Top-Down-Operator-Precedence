@@ -1,29 +1,29 @@
 var parse = function (tokens) {
 	var symbols = {},
-	symbol = function (id, nud, lbp, led) {
+	symbol = function (id, tokenCallback, lbp, led) {
 		var sym = symbols[id] || {};
 		symbols[id] = {
 			lbp: sym.lbp || lbp,
-			nud: sym.nud || nud,
+			tokenCallback: sym.tokenCallback || tokenCallback,
 			led: sym.lef || led
 		};
 	};
 
-	var interpretToken = function (token) {
+	var token2symbol = function (token) {
 		var sym = Object.create(symbols[token.type]);
 		sym.type = token.type;
 		sym.value = token.value;
 		return sym;
 	};
 
-	var i = 0, token = function () { return interpretToken(tokens[i]); };
+	var i = 0, token = function () { return token2symbol(tokens[i]); };
 	var advance = function () { i++; return token(); };
 
 	var expression = function (rbp) {
 		var left, t = token();
 		advance();
-		if (!t.nud) throw "Unexpected token: " + t.type;
-		left = t.nud(t);
+		if (!t.tokenCallback) throw "Unexpected token: " + t.type;
+		left = t.tokenCallback(t);
 		while (rbp < token().lbp) {
 			t = token();
 			advance();
@@ -64,6 +64,11 @@ var parse = function (tokens) {
 	symbol("string", function (node) {
 		console.log("symbol->string->node: ", node);
 		node.nigga = "plz";
+		return node;
+	});
+	
+	symbol("foo", function(node) {
+		console.log("Foo: ", node);
 		return node;
 	});
 	

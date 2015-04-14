@@ -54,7 +54,11 @@ var lex = function (input) {
 		else if (isIdentifier(c)) {
 			var idn = c;
 			while (isIdentifier(advance())) idn += c;
-			addToken("identifier", idn);
+			
+			if (idn == "foo")
+				addToken("foo");
+			else
+				addToken("identifier", idn);
 		}
 		else throw "Unrecognized token.";
 	}
