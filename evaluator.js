@@ -101,12 +101,12 @@ function PrettyPrint(node, depth)
 		}
 		
 		default:
-			nonewline = function(msg) { return msg.replace(/\r\n/g, " "); }
+			nonewline = function(msg) { return msg.replace(/\r\n\t/g, " "); }
 			tmp = "";
 			for (key in node) {
 				if (key == "args" || key == "left" || key == "right") // will be printed separately
 					continue;
-				tmp += "node." + key + "=" + node[key] + " ";
+				tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
 			}
 			tmp = nonewline(tmp);
 			print(indent + tmp);
