@@ -42,8 +42,10 @@ PrettyPrint(1,2)
 <script>
 	var calculate = function (input) {
 		var tokens = lex(input);
-		var parseTree = parse(tokens);
-		var output = evaluate(parseTree);
+		//var parseTree = parse(tokens);
+		parser = new Parser(tokens);
+		
+		var output = evaluate(parser.parseTree);
 		return output;
 	};
 

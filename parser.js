@@ -13,36 +13,38 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 //  lbp     Left binding power		== leftBindingPower
 //  rbp     Right binding power		== rightBindingPower
 */
-var parse = function (tokens) {
-	var symbols = {},
-	symbol = function (id, tokenCallback, leftBindingPower, leftDenotation) {
-		var sym = symbols[id] || {};
-		symbols[id] = {
+function Parser(tokens_) {
+	this.tokens = tokens_;
+	this.symbols = {};
+	this.symbol = function(id, tokenCallback, leftBindingPower, leftDenotation) {
+		var sym = this.symbols[id] || {};
+		this.symbols[id] = {
 			leftBindingPower: sym.leftBindingPower || leftBindingPower,
 			tokenCallback: sym.tokenCallback || tokenCallback,
 			leftDenotation: sym.leftDenotation || leftDenotation
 		};
 	};
 
-	var token2symbol = function (token) {
-		var sym = Object.create(symbols[token.type]);
+	this.token2symbol = function(token) {
+		var sym = Object.create(this.symbols[token.type]);
 		sym.type = token.type;
 		sym.value = token.value;
 		return sym;
 	};
 
-	var i = 0, token = function () { return token2symbol(tokens[i]); };
-	var advance = function () { i++; return token(); };
+	this.i = 0;
+	this.token = function () { return this.token2symbol(this.tokens[this.i]); };
+	this.advance = function () { this.i++; return this.token(); };
 
-	var expression = function (rightBindingPower) {
-		var left, t = token();
-		advance();
+	this.expression = function (rightBindingPower) {
+		var left, t = this.token();
+		this.advance();
 		if (!t.tokenCallback)
 			throw "Unexpected token: " + t.type;
 		left = t.tokenCallback(t);
-		while (rightBindingPower < token().leftBindingPower) {
-			t = token();
-			advance();
+		while (rightBindingPower < this.token().leftBindingPower) {
+			t = this.token();
+			this.advance();
 			if (!t.leftDenotation)
 				throw "Unexpected token: " + t.type;
 			left = t.leftDenotation(left);
@@ -50,61 +52,62 @@ var parse = function (tokens) {
 		return left;
 	};
 
-	var infix = function (id, leftBindingPower, rightBindingPower, leftDenotation) {
+	this.infix = function (id, leftBindingPower, rightBindingPower, leftDenotation) {
 		rightBindingPower = rightBindingPower || leftBindingPower;
-		symbol(id, null, leftBindingPower, leftDenotation || function (left) {
+		this.symbol(id, null, leftBindingPower, leftDenotation || function (left) {
 			return {
 				type: id,
 				left: left,
-				right: expression(rightBindingPower)
+				right: this.expression(rightBindingPower)
 			};
-		});
-	},
-	prefix = function (id, rightBindingPower) {
-		symbol(id, function () {
+		}.bind(this));
+	};
+	
+	this.prefix = function (id, rightBindingPower) {
+		this.symbol(id, function () {
 			return {
 				type: id,
-				right: expression(rightBindingPower)
+				right: this.expression(rightBindingPower)
 			};
-		});
+		}.bind(this));
 	};
 
 
-	symbol(",");
-	symbol(")");
-	symbol("(end)");
+	this.symbol(",");
+	this.symbol(")");
+	this.symbol("(end)");
 
-	symbol("number", function (number) {
+	this.symbol("number", function (number) {
 		return number;
 	});
 	
-	symbol("string", function (node) {
+	this.symbol("string", function (node) {
 		console.log("symbol->string->node: ", node);
 		node.nigga = "plz";
 		return node;
 	});
 	
-	symbol("foo", function(node) {
+	this.symbol("foo", function (node) {
 		node.type = "number";
 		node.value = 100000000000000;
 		console.log("Foo: ", node);
 		return node;
 	});
 	
-	symbol("identifier", function (name) {
-		if (token().type === "(") {
+	this.symbol("identifier", function (name) {
+		if (this.token().type === "(") {
 			var args = [];
-			if (tokens[i + 1].type === ")")
-				advance();
+			if (this.tokens[this.i + 1].type === ")")
+				this.advance();
 			else {
 				do {
-					advance();
-					args.push(expression(2));
-				} while (token().type === ",");
-				if (token().type !== ")")
+					this.advance();
+					args.push(this.expression(2));
+				} while (this.token().type === ",");
+				if (this.token().type !== ")")
 					throw "Expected closing parenthesis ')'";
 			}
-			advance();
+			this.advance();
 			return {
 				type: "call",
 				args: args,
@@ -112,49 +115,51 @@ var parse = function (tokens) {
 			};
 		}
 		return name;
-	});
+	}.bind(this));
 
-	symbol("(", function () {
-		value = expression(2);
-		if (token().type !== ")")
+	this.symbol("(", function () {
+		value = this.expression(2);
+		if (this.token().type !== ")")
 			throw "Expected closing parenthesis ')'";
-		advance();
+		this.advance();
 		return value;
-	});
+	}.bind(this));
 
-	prefix("-", 7);
-	infix("^", 6, 5);
-	infix("*", 4);
-	infix("/", 4);
-	infix("%", 4);
-	infix("+", 3);
-	infix("-", 3);
+	this.prefix("-", 7);
+	this.infix("^", 6, 5);
+	this.infix("*", 4);
+	this.infix("/", 4);
+	this.infix("%", 4);
+	this.infix("+", 3);
+	this.infix("-", 3);
 
-	infix("=", 1, 2, function (left) {
+	this.infix("=", 1, 2, function (left) {
 		if (left.type === "call") {
-			for (var i = 0; i < left.args.length; i++) {
-				if (left.args[i].type !== "identifier") throw "Invalid argument name";
+			for (var j = 0; j < left.args.length; j++) {
+				if (left.args[j].type !== "identifier")
+					throw "Invalid argument name";
 			}
 			return {
 				type: "function",
 				name: left.name,
 				args: left.args,
-				value: expression(2)
+				value: this.expression(2)
 			};
 		} else if (left.type === "identifier") {
 			return {
 				type: "assign",
 				name: left.value,
-				value: expression(2)
+				value: this.expression(2)
 			};
 		}
 		else
 			throw "Invalid lvalue";
-	});
+	}.bind(this));
 
-	var parseTree = [];
-	while (token().type !== "(end)") {
-		parseTree.push(expression(0));
+	
+	
+	this.parseTree = [];
+	while (this.token().type !== "(end)") {
+		this.parseTree.push(this.expression(0));
 	}
-	return parseTree;
 };
