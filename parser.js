@@ -1,11 +1,26 @@
+/*
+http://javascript.crockford.com/tdop/tdop.html
+https://github.com/douglascrockford/JSLint/blob/master/jslint.js
+// This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
+// is looking for ad hoc lint patterns. We add .fud to Pratt's model, which is
+// like .nud except that it is only used on the first token of a statement.
+// Having .fud makes it much easier to define statement-oriented languages like
+// JavaScript. I retained Pratt's nomenclature.
+
+// .nud     Null denotation			== tokenCallback
+// .fud     First null denotation	== 
+// .led     Left denotation			== leftDenotation
+//  lbp     Left binding power		== leftBindingPower
+//  rbp     Right binding power		== rightBindingPower
+*/
 var parse = function (tokens) {
 	var symbols = {},
-	symbol = function (id, tokenCallback, lbp, led) {
+	symbol = function (id, tokenCallback, leftBindingPower, leftDenotation) {
 		var sym = symbols[id] || {};
 		symbols[id] = {
-			lbp: sym.lbp || lbp,
+			leftBindingPower: sym.leftBindingPower || leftBindingPower,
 			tokenCallback: sym.tokenCallback || tokenCallback,
-			led: sym.lef || led
+			leftDenotation: sym.leftDenotation || leftDenotation
 		};
 	};
 
@@ -19,35 +34,37 @@ var parse = function (tokens) {
 	var i = 0, token = function () { return token2symbol(tokens[i]); };
 	var advance = function () { i++; return token(); };
 
-	var expression = function (rbp) {
+	var expression = function (rightBindingPower) {
 		var left, t = token();
 		advance();
-		if (!t.tokenCallback) throw "Unexpected token: " + t.type;
+		if (!t.tokenCallback)
+			throw "Unexpected token: " + t.type;
 		left = t.tokenCallback(t);
-		while (rbp < token().lbp) {
+		while (rightBindingPower < token().leftBindingPower) {
 			t = token();
 			advance();
-			if (!t.led) throw "Unexpected token: " + t.type;
-			left = t.led(left);
+			if (!t.leftDenotation)
+				throw "Unexpected token: " + t.type;
+			left = t.leftDenotation(left);
 		}
 		return left;
 	};
 
-	var infix = function (id, lbp, rbp, led) {
-		rbp = rbp || lbp;
-		symbol(id, null, lbp, led || function (left) {
+	var infix = function (id, leftBindingPower, rightBindingPower, leftDenotation) {
+		rightBindingPower = rightBindingPower || leftBindingPower;
+		symbol(id, null, leftBindingPower, leftDenotation || function (left) {
 			return {
 				type: id,
 				left: left,
-				right: expression(rbp)
+				right: expression(rightBindingPower)
 			};
 		});
 	},
-	prefix = function (id, rbp) {
+	prefix = function (id, rightBindingPower) {
 		symbol(id, function () {
 			return {
 				type: id,
-				right: expression(rbp)
+				right: expression(rightBindingPower)
 			};
 		});
 	};
@@ -68,6 +85,8 @@ var parse = function (tokens) {
 	});
 	
 	symbol("foo", function(node) {
+		node.type = "number";
+		node.value = 100000000000000;
 		console.log("Foo: ", node);
 		return node;
 	});
@@ -75,13 +94,15 @@ var parse = function (tokens) {
 	symbol("identifier", function (name) {
 		if (token().type === "(") {
 			var args = [];
-			if (tokens[i + 1].type === ")") advance();
+			if (tokens[i + 1].type === ")")
+				advance();
 			else {
 				do {
 					advance();
 					args.push(expression(2));
 				} while (token().type === ",");
-				if (token().type !== ")") throw "Expected closing parenthesis ')'";
+				if (token().type !== ")")
+					throw "Expected closing parenthesis ')'";
 			}
 			advance();
 			return {
@@ -95,7 +116,8 @@ var parse = function (tokens) {
 
 	symbol("(", function () {
 		value = expression(2);
-		if (token().type !== ")") throw "Expected closing parenthesis ')'";
+		if (token().type !== ")")
+			throw "Expected closing parenthesis ')'";
 		advance();
 		return value;
 	});
@@ -126,7 +148,8 @@ var parse = function (tokens) {
 				value: expression(2)
 			};
 		}
-		else throw "Invalid lvalue";
+		else
+			throw "Invalid lvalue";
 	});
 
 	var parseTree = [];
