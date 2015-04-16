@@ -107,12 +107,24 @@ function PrettyPrint(node, depth)
 			nonewline = function(msg) { return msg.replace(/\r\n\t/g, " "); }
 			tmp = "";
 			for (key in node) {
-				if (key == "args" || key == "left" || key == "right") // will be printed separately
+				if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 					continue;
 				tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
 			}
 			tmp = nonewline(tmp);
 			print(indent + tmp);
+			if (typeof node.symbol != "undefined") {
+				print(indent + "node.symbol:");
+				
+				tmp = "";
+				for (key in node.symbol) {
+					if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
+						continue;
+					tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
+				}
+				print(indent + tmp);
+				
+			}
 			if (typeof node.left != "undefined") {
 				print(indent + "node.left:");
 				PrettyPrint(node.left, depth + 1);

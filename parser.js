@@ -14,14 +14,18 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 //  rbp     Right binding power		== rightBindingPower
 */
 
+//Object.prototype.getClass = function() { return this.constructor.name; }
+
 function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
 	var oldSymbol = parser.symbols[id];
 	if (oldSymbol) {
-		oldSymbol.Update(tokenCallback, leftBindingPower, leftDenotation);
+		//console.log("Update: ", this.id, tokenCallback, leftBindingPower, leftDenotation);
+		this.tokenCallback = this.tokenCallback || tokenCallback;
+		this.leftBindingPower = this.leftBindingPower || leftBindingPower;
+		this.leftDenotation = this.leftDenotation || leftDenotation;
 		this.symbol = oldSymbol;
 		return;
 	}
-
 	this.parser = parser;
 	this.id = id;
 	this.tokenCallback = tokenCallback;
@@ -29,13 +33,7 @@ function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
 	this.leftDenotation = leftDenotation;
 	this.parser.symbols[id] = this;
 	this.symbol = this;
-	
-	this.Update = function(tokenCallback, leftBindingPower, leftDenotation) {
-		//console.log("Update: ", this.id, tokenCallback, leftBindingPower, leftDenotation);
-		this.tokenCallback = this.tokenCallback || tokenCallback;
-		this.leftBindingPower = this.leftBindingPower || leftBindingPower;
-		this.leftDenotation = this.leftDenotation || leftDenotation;
-	};
+	this.clazz = "Symbol";
 }
 
 function Parser(tokens_) {
@@ -76,7 +74,14 @@ function Parser(tokens_) {
 		rightBindingPower = rightBindingPower || leftBindingPower;
 		this.symbol(id, null, leftBindingPower, leftDenotation || function (left) {
 			return {
+				clazz_infix: "Node Infix",
 				type: id,
+				//left: {
+				//	clazz_infix_left: "Infix Left",
+				//	type: left.type,
+				//	value: left.value,
+				//	args: left.args,
+				//},
 				left: left,
 				right: this.expression(rightBindingPower)
 			};
@@ -86,6 +91,7 @@ function Parser(tokens_) {
 	this.prefix = function (id, rightBindingPower) {
 		this.symbol(id, function () {
 			return {
+				clazz_prefix: "Node Prefix",
 				type: id,
 				right: this.expression(rightBindingPower)
 			};
@@ -98,6 +104,11 @@ function Parser(tokens_) {
 	this.symbol("(end)");
 
 	this.symbol("number", function (number) {
+		//return {
+		//	type: "number",
+		//	value: number.value,
+		//	symbol: number
+		//};
 		return number;
 	});
 	
@@ -129,6 +140,7 @@ function Parser(tokens_) {
 			}
 			this.advance();
 			return {
+				clazz_identifier: "Node Identifier",
 				type: "call",
 				args: args,
 				name: name.value
