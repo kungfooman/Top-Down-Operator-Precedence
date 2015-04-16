@@ -13,16 +13,36 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 //  lbp     Left binding power		== leftBindingPower
 //  rbp     Right binding power		== rightBindingPower
 */
+
+function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
+	var oldSymbol = parser.symbols[id];
+	if (oldSymbol) {
+		oldSymbol.Update(tokenCallback, leftBindingPower, leftDenotation);
+		this.symbol = oldSymbol;
+		return;
+	}
+
+	this.parser = parser;
+	this.id = id;
+	this.tokenCallback = tokenCallback;
+	this.leftBindingPower = leftBindingPower;
+	this.leftDenotation = leftDenotation;
+	this.parser.symbols[id] = this;
+	this.symbol = this;
+	
+	this.Update = function(tokenCallback, leftBindingPower, leftDenotation) {
+		//console.log("Update: ", this.id, tokenCallback, leftBindingPower, leftDenotation);
+		this.tokenCallback = this.tokenCallback || tokenCallback;
+		this.leftBindingPower = this.leftBindingPower || leftBindingPower;
+		this.leftDenotation = this.leftDenotation || leftDenotation;
+	};
+}
+
 function Parser(tokens_) {
 	this.tokens = tokens_;
 	this.symbols = {};
 	this.symbol = function(id, tokenCallback, leftBindingPower, leftDenotation) {
-		var sym = this.symbols[id] || {};
-		this.symbols[id] = {
-			leftBindingPower: sym.leftBindingPower || leftBindingPower,
-			tokenCallback: sym.tokenCallback || tokenCallback,
-			leftDenotation: sym.leftDenotation || leftDenotation
-		};
+		new Symbol(this, id, tokenCallback, leftBindingPower, leftDenotation).symbol;
 	};
 
 	this.token2symbol = function(token) {
