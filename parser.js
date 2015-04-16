@@ -7,7 +7,7 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 // Having .fud makes it much easier to define statement-oriented languages like
 // JavaScript. I retained Pratt's nomenclature.
 
-// .nud     Null denotation			== tokenCallback
+// .nud     Null denotation			== symbolCallback
 // .fud     First null denotation	== 
 // .led     Left denotation			== leftDenotation
 //  lbp     Left binding power		== leftBindingPower
@@ -16,11 +16,11 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 
 //Object.prototype.getClass = function() { return this.constructor.name; }
 
-function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
+function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
 	var oldSymbol = parser.symbols[id];
 	if (oldSymbol) {
-		//console.log("Update: ", this.id, tokenCallback, leftBindingPower, leftDenotation);
-		this.tokenCallback = this.tokenCallback || tokenCallback;
+		//console.log("Update: ", this.id, symbolCallback, leftBindingPower, leftDenotation);
+		this.symbolCallback = this.symbolCallback || symbolCallback;
 		this.leftBindingPower = this.leftBindingPower || leftBindingPower;
 		this.leftDenotation = this.leftDenotation || leftDenotation;
 		this.symbol = oldSymbol;
@@ -28,7 +28,7 @@ function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
 	}
 	this.parser = parser;
 	this.id = id;
-	this.tokenCallback = tokenCallback;
+	this.symbolCallback = symbolCallback;
 	this.leftBindingPower = leftBindingPower;
 	this.leftDenotation = leftDenotation;
 	this.parser.symbols[id] = this;
@@ -39,8 +39,8 @@ function Symbol(parser, id, tokenCallback, leftBindingPower, leftDenotation) {
 function Parser(tokens_) {
 	this.tokens = tokens_;
 	this.symbols = {};
-	this.symbol = function(id, tokenCallback, leftBindingPower, leftDenotation) {
-		new Symbol(this, id, tokenCallback, leftBindingPower, leftDenotation).symbol;
+	this.symbol = function(id, symbolCallback, leftBindingPower, leftDenotation) {
+		new Symbol(this, id, symbolCallback, leftBindingPower, leftDenotation).symbol;
 	};
 
 	this.token2symbol = function(token) {
@@ -51,21 +51,21 @@ function Parser(tokens_) {
 	};
 
 	this.i = 0;
-	this.token = function () { return this.token2symbol(this.tokens[this.i]); };
-	this.advance = function () { this.i++; return this.token(); };
+	this.currentSymbol = function () { return this.token2symbol(this.tokens[this.i]); };
+	this.advanceSymbol = function () { this.i++; return this.currentSymbol(); };
 
 	this.expression = function (rightBindingPower) {
-		var left, t = this.token();
-		this.advance();
-		if (!t.tokenCallback)
-			throw "Unexpected token: " + t.type;
-		left = t.tokenCallback(t);
-		while (rightBindingPower < this.token().leftBindingPower) {
-			t = this.token();
-			this.advance();
-			if (!t.leftDenotation)
-				throw "Unexpected token: " + t.type;
-			left = t.leftDenotation(left);
+		var sym = this.currentSymbol();
+		this.advanceSymbol();
+		if (!sym.symbolCallback)
+			throw "Unexpected token in symbol: " + sym.type;
+		var left = sym.symbolCallback(sym);
+		while (rightBindingPower < this.currentSymbol().leftBindingPower) {
+			sym = this.currentSymbol();
+			this.advanceSymbol();
+			if (!sym.leftDenotation)
+				throw "Unexpected token: " + sym.type;
+			left = sym.leftDenotation(left);
 		}
 		return left;
 	};
@@ -126,19 +126,19 @@ function Parser(tokens_) {
 	});
 	
 	this.symbol("identifier", function (name) {
-		if (this.token().type === "(") {
+		if (this.currentSymbol().type === "(") {
 			var args = [];
 			if (this.tokens[this.i + 1].type === ")")
-				this.advance();
+				this.advanceSymbol();
 			else {
 				do {
-					this.advance();
+					this.advanceSymbol();
 					args.push(this.expression(2));
-				} while (this.token().type === ",");
-				if (this.token().type !== ")")
+				} while (this.currentSymbol().type === ",");
+				if (this.currentSymbol().type !== ")")
 					throw "Expected closing parenthesis ')'";
 			}
-			this.advance();
+			this.advanceSymbol();
 			return {
 				clazz_identifier: "Node Identifier",
 				type: "call",
@@ -151,9 +151,9 @@ function Parser(tokens_) {
 
 	this.symbol("(", function () {
 		value = this.expression(2);
-		if (this.token().type !== ")")
+		if (this.currentSymbol().type !== ")")
 			throw "Expected closing parenthesis ')'";
-		this.advance();
+		this.advanceSymbol();
 		return value;
 	}.bind(this));
 
@@ -191,7 +191,7 @@ function Parser(tokens_) {
 	
 	
 	this.parseTree = [];
-	while (this.token().type !== "(end)") {
+	while (this.currentSymbol().type !== "(end)") {
 		this.parseTree.push(this.expression(0));
 	}
 };
