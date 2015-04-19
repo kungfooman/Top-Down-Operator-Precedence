@@ -28,9 +28,9 @@ function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
 	}
 	this.parser = parser;
 	this.id = id;
-	this.symbolCallback = symbolCallback;
+	this.symbolCallback = symbolCallback || function(node) { throw "symbolCallback> unexpected token: " +  node.type};
 	this.leftBindingPower = leftBindingPower;
-	this.leftDenotation = leftDenotation;
+	this.leftDenotation = leftDenotation || function(node) { throw "leftDenotation> unexpected token: " +  node.type};
 	this.parser.symbols[id] = this;
 	this.symbol = this;
 	this.clazz = "Symbol";
@@ -57,14 +57,10 @@ function Parser(tokens_) {
 	this.expression = function (rightBindingPower) {
 		var sym = this.currentSymbol();
 		this.advanceSymbol();
-		if (!sym.symbolCallback)
-			throw "Unexpected token in symbol: " + sym.type;
 		var left = sym.symbolCallback(sym);
 		while (rightBindingPower < this.currentSymbol().leftBindingPower) {
 			sym = this.currentSymbol();
 			this.advanceSymbol();
-			if (!sym.leftDenotation)
-				throw "Unexpected token: " + sym.type;
 			left = sym.leftDenotation(left);
 		}
 		return left;
