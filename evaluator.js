@@ -79,8 +79,8 @@ var evaluate = function (parseTree) {
 	};
 
 	var output = "";
-	for (var i = 0; i < parseTree.length; i++) {
-		var value = parseNode(parseTree[i]);
+	for (var i = 0; i < parseTree.statements.length; i++) {
+		var value = parseNode(parseTree.statements[i]);
 		if (typeof value !== "undefined") output += value + "\n";
 	}
 	return output;
@@ -104,15 +104,14 @@ function PrettyPrint(node, depth)
 		}
 		
 		default:
-			nonewline = function(msg) { return msg.replace(/\r\n\t/g, " "); }
+			nonewline = function(msg) { return msg.replace(/\r\n/g, " ").replace(/\n/g, " "); }
 			tmp = "";
 			for (key in node) {
 				if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 					continue;
 				tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
 			}
-			tmp = nonewline(tmp);
-			print(indent + tmp);
+			print(indent + nonewline(tmp));
 			if (typeof node.symbol != "undefined") {
 				print(indent + "node.symbol:");
 				
@@ -122,7 +121,7 @@ function PrettyPrint(node, depth)
 						continue;
 					tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
 				}
-				print(indent + tmp);
+				print(indent + nonewline(tmp));
 				
 			}
 			if (typeof node.left != "undefined") {
@@ -137,6 +136,13 @@ function PrettyPrint(node, depth)
 				print(indent + "node.args:");
 				for (var i = 0; i < node.args.length; i++) {
 					PrettyPrint(node.args[i], depth + 1);
+				}
+			}
+			if (typeof node.statements != "undefined") {
+				print(indent + "node.statements:");
+				for (var i = 0; i < node.statements.length; i++) {
+					print(indent + "node.statement["+ i +"]:");
+					PrettyPrint(node.statements[i], depth + 1);
 				}
 			}
 			break;

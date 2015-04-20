@@ -100,11 +100,6 @@ function Parser(tokens_) {
 	this.symbol("(end)");
 
 	this.symbol("number", function (number) {
-		//return {
-		//	type: "number",
-		//	value: number.value,
-		//	symbol: number
-		//};
 		return number;
 	});
 	
@@ -184,10 +179,12 @@ function Parser(tokens_) {
 			throw "Invalid lvalue";
 	}.bind(this));
 
-	
-	
-	this.parseTree = [];
+	var statements = [];
 	while (this.currentSymbol().type !== "(end)") {
-		this.parseTree.push(this.expression(0));
+		statements.push(this.expression(0));
 	}
+	this.parseTree = {
+		type: "statements",
+		statements: statements
+	};
 };

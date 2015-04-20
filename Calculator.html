@@ -2,6 +2,11 @@
 <html>
 <head>
 	<title>Calculator</title>
+	<style>
+		td {
+			vertical-align: top;
+		}
+	</style>
 </head>
 <body>
 
@@ -30,7 +35,10 @@ cylinderVolume(2, 4)
 PrettyPrint(1,2)
 				</textarea>
 			<td>
-				<button id="calculate">Calculate</button>
+				<button id="calculate">Calculate</button><br>
+				<button id="prettyprint">PrettyPrint</button><br>
+				<button id="clear">Clear</button><br>
+				<button id="prettyprintselection">PrettyPrint Selection</button>
 			<td>
 				<pre id="output" style="min-width:100px; border: 1px solid black"></pre>
 		<tr>
@@ -60,6 +68,32 @@ PrettyPrint(1,2)
 		var input = document.getElementById("input").value;
 		output = calculate(input);
 		print("\nStatement evaluations: \n" + output);
+	};
+	document.getElementById("clear").onclick = function () {
+		clear()
+	};
+	document.getElementById("prettyprint").onclick = function () {
+		var input = document.getElementById("input").value;
+		output = calculate(input);
+		
+		var tokens = lex(input);
+		parser = new Parser(tokens);
+		
+		PrettyPrint(parser.parseTree, 0);
+	};
+	document.getElementById("prettyprintselection").onclick = function () {
+		textarea = document.getElementById("input");
+		s = textarea.selectionStart;
+		e = textarea.selectionEnd;
+		var input = textarea.value.substring(s,e)
+		print("Selection: <div class=selection>" + input + "</div>");
+		
+		output = calculate(input);
+		
+		var tokens = lex(input);
+		parser = new Parser(tokens);
+		
+		PrettyPrint(parser.parseTree, 0);
 	};
 </script>
 </body>
