@@ -48,11 +48,63 @@ PrettyPrint(1,2)
 <script src="parser.js"></script>
 <script src="evaluator.js"></script>
 <script>
+	function getArgs(func) {
+		var s;
+		s = func.toString();
+		s = s.substring(10, s.indexOf(")"));
+		s = s.replace(/ /g, "");
+		return s.split(",");
+	}
+	
+	/*
+		function(id, leftBindingPower, rightBindingPower, leftDenotation) {
+			
+			eval("console.log(\"infix:\", id, leftBindingPower, rightBindingPower, leftDenotation, getArgs(parser).join('a'));")
+			oldinfix(id, leftBindingPower, rightBindingPower, leftDenotation);
+		}
+	*/
+	
+	function toSource(func) {
+		var src = func.toSource();
+		//console.log(src);
+		return src.substring(src.indexOf("{")+1, src.length - 2);
+	}
+	
+	function hookLog(obj, oldFunc, funcname) {
+		var tmp;
+		tmp += "a = function (obj, oldFunc, funcname)";
+		tmp += "{";
+			//tmp += "console.log(\"oldFunc:\", oldFunc, \"parser:\", obj);";
+		
+			var args = getArgs(oldFunc);
+			tmp += "return function (" + args.join(",") + ")";
+			tmp += "{";
+				tmp += toSource(function() {
+					var a = [funcname + ">"];
+					for (var i=0; i<args.length; i++) {
+						a.push(args[i], eval(args[i]));
+					}
+					console.log.apply(null, a);
+				});
+				tmp += "oldFunc.bind(obj)(" + args.join(",") + ")";
+			tmp += "}";
+		
+		tmp += "}";
+		return eval(tmp)(obj, oldFunc, funcname);
+	}
+	
 	var calculate = function (input) {
 		var tokens = lex(input);
 		//var parseTree = parse(tokens);
 		parser = new Parser(tokens);
 		
+		//oldinfix = parser.infix.bind(parser);
+		parser.infix = hookLog(parser, parser.infix, "infix");
+		//oldexpression = parser.expression.bind(parser);
+		//console.log(parser.infix.toSource());
+		parser.init();
+		parser.expression = hookLog(parser, parser.expression, "expression");
+		parser.parse();
 		var output = evaluate(parser.parseTree);
 		return output;
 	};

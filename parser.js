@@ -94,97 +94,102 @@ function Parser(tokens_) {
 		}.bind(this));
 	};
 
+	this.init = function() {
+		this.symbol(",");
+		this.symbol(")");
+		this.symbol("(end)");
 
-	this.symbol(",");
-	this.symbol(")");
-	this.symbol("(end)");
-
-	this.symbol("number", function (number) {
-		return number;
-	});
-	
-	this.symbol("string", function (node) {
-		console.log("symbol->string->node: ", node);
-		node.nigga = "plz";
-		return node;
-	});
-	
-	this.symbol("foo", function (node) {
-		node.type = "number";
-		node.value = 100000000000000;
-		console.log("Foo: ", node);
-		return node;
-	});
-	
-	this.symbol("identifier", function (name) {
-		if (this.currentSymbol().type === "(") {
-			var args = [];
-			if (this.tokens[this.i + 1].type === ")")
-				this.advanceSymbol();
-			else {
-				do {
+		this.symbol("number", function (number) {
+			return number;
+		});
+		
+		this.symbol("string", function (node) {
+			console.log("symbol->string->node: ", node);
+			node.nigga = "plz";
+			return node;
+		});
+		
+		this.symbol("foo", function (node) {
+			node.type = "number";
+			node.value = 100000000000000;
+			console.log("Foo: ", node);
+			return node;
+		});
+		
+		this.symbol("identifier", function (name) {
+			if (this.currentSymbol().type === "(") {
+				var args = [];
+				if (this.tokens[this.i + 1].type === ")")
 					this.advanceSymbol();
-					args.push(this.expression(2));
-				} while (this.currentSymbol().type === ",");
-				if (this.currentSymbol().type !== ")")
-					throw "Expected closing parenthesis ')'";
+				else {
+					do {
+						this.advanceSymbol();
+						args.push(this.expression(2));
+					} while (this.currentSymbol().type === ",");
+					if (this.currentSymbol().type !== ")")
+						throw "Expected closing parenthesis ')'";
+				}
+				this.advanceSymbol();
+				return {
+					clazz_identifier: "Node Identifier",
+					type: "call",
+					args: args,
+					name: name.value
+				};
 			}
+			return name;
+		}.bind(this));
+
+		this.symbol("(", function () {
+			value = this.expression(2);
+			if (this.currentSymbol().type !== ")")
+				throw "Expected closing parenthesis ')'";
 			this.advanceSymbol();
-			return {
-				clazz_identifier: "Node Identifier",
-				type: "call",
-				args: args,
-				name: name.value
-			};
-		}
-		return name;
-	}.bind(this));
+			return value;
+		}.bind(this));
 
-	this.symbol("(", function () {
-		value = this.expression(2);
-		if (this.currentSymbol().type !== ")")
-			throw "Expected closing parenthesis ')'";
-		this.advanceSymbol();
-		return value;
-	}.bind(this));
+		this.prefix("-", 7);
+		this.infix("^", 6, 5);
+		this.infix("*", 4);
+		this.infix("/", 4);
+		this.infix("%", 4);
+		this.infix("+", 3);
+		this.infix("-", 3);
 
-	this.prefix("-", 7);
-	this.infix("^", 6, 5);
-	this.infix("*", 4);
-	this.infix("/", 4);
-	this.infix("%", 4);
-	this.infix("+", 3);
-	this.infix("-", 3);
-
-	this.infix("=", 1, 2, function (left) {
-		if (left.type === "call") {
-			for (var j = 0; j < left.args.length; j++) {
-				if (left.args[j].type !== "identifier")
-					throw "Invalid argument name";
+		this.infix("=", 1, 2, function (left) {
+			if (left.type === "call") {
+				for (var j = 0; j < left.args.length; j++) {
+					if (left.args[j].type !== "identifier")
+						throw "Invalid argument name";
+				}
+				return {
+					type: "function",
+					name: left.name,
+					args: left.args,
+					value: this.expression(2)
+				};
+			} else if (left.type === "identifier") {
+				return {
+					type: "assign",
+					name: left.value,
+					value: this.expression(2)
+				};
 			}
-			return {
-				type: "function",
-				name: left.name,
-				args: left.args,
-				value: this.expression(2)
-			};
-		} else if (left.type === "identifier") {
-			return {
-				type: "assign",
-				name: left.value,
-				value: this.expression(2)
-			};
-		}
-		else
-			throw "Invalid lvalue";
-	}.bind(this));
-
-	var statements = [];
-	while (this.currentSymbol().type !== "(end)") {
-		statements.push(this.expression(0));
+			else
+				throw "Invalid lvalue";
+		}.bind(this));
 	}
-	this.parseTree = {
-		type: "statements",
-		statements: statements
-	};
+	
+	this.parse = function() {
+	
+		var statements = [];
+		while (this.currentSymbol().type !== "(end)") {
+			statements.push(this.expression(0));
+		}
+		this.parseTree = {
+			type: "statements",
+			statements: statements
+		};
+		return this.parseTree;
+	}
 };
