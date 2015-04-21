@@ -85,8 +85,10 @@ PrettyPrint(1,2)
 						a.push(args[i], eval(args[i]));
 					}
 					console.log.apply(null, a);
+					//oldFunc.apply(obj, args);
 				});
-				tmp += "oldFunc.bind(obj)(" + args.join(",") + ")";
+				tmp += "return oldFunc.bind(obj)(" + args.join(",") + ");";
+				
 			tmp += "}";
 		
 		tmp += "}";
@@ -98,12 +100,12 @@ PrettyPrint(1,2)
 		//var parseTree = parse(tokens);
 		parser = new Parser(tokens);
 		
-		//oldinfix = parser.infix.bind(parser);
-		parser.infix = hookLog(parser, parser.infix, "infix");
-		//oldexpression = parser.expression.bind(parser);
-		//console.log(parser.infix.toSource());
-		parser.init();
+		//parser.infix = hookLog(parser, parser.infix, "infix");
 		parser.expression = hookLog(parser, parser.expression, "expression");
+		//comma = parser.symbols[","].leftDenotation;
+		//comma.leftDenotation = hookLog(parser, comma.leftDenotation, "Comma");
+		
+		parser.init();
 		parser.parse();
 		var output = evaluate(parser.parseTree);
 		return output;
@@ -130,6 +132,8 @@ PrettyPrint(1,2)
 		
 		var tokens = lex(input);
 		parser = new Parser(tokens);
+		parser.init();
+		parser.parse();
 		
 		PrettyPrint(parser.parseTree, 0);
 	};
@@ -144,7 +148,8 @@ PrettyPrint(1,2)
 		
 		var tokens = lex(input);
 		parser = new Parser(tokens);
-		
+		parser.init();
+		parser.parse();
 		PrettyPrint(parser.parseTree, 0);
 	};
 </script>
