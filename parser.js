@@ -71,7 +71,7 @@ function Parser(tokens_) {
 		this.symbol(id, null, leftBindingPower, leftDenotation || function (left) {
 			return {
 				clazz_infix: "Node Infix",
-				type: id,
+				type: this.closure_infix.id,
 				//left: {
 				//	clazz_infix_left: "Infix Left",
 				//	type: left.type,
@@ -79,19 +79,32 @@ function Parser(tokens_) {
 				//	args: left.args,
 				//},
 				left: left,
-				right: this.expression(rightBindingPower)
+				right: this.parser.expression(this.closure_infix.rightBindingPower)
 			};
-		}.bind(this));
+		});
+		
+		// save closure scope stuff
+		this.symbols[id].closure_infix = {
+			id: id,
+			leftBindingPower: leftBindingPower,
+			rightBindingPower: rightBindingPower,
+			leftDenotation: leftDenotation
+		};
 	};
 	
 	this.prefix = function (id, rightBindingPower) {
 		this.symbol(id, function () {
 			return {
 				clazz_prefix: "Node Prefix",
-				type: id,
-				right: this.expression(rightBindingPower)
+				type: this.closure_prefix.id,
+				right: this.parser.expression(this.closure_prefix.rightBindingPower)
 			};
-		}.bind(this));
+		});
+		// save closure scope stuff
+		this.symbols[id].closure_prefix = {
+			id: id,
+			rightBindingPower: rightBindingPower
+		};
 	};
 
 	this.init = function() {
