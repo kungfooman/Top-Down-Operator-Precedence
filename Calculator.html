@@ -101,11 +101,14 @@ PrettyPrint(1,2)
 		parser = new Parser(tokens);
 		
 		//parser.infix = hookLog(parser, parser.infix, "infix");
-		parser.expression = hookLog(parser, parser.expression, "expression");
-		//comma = parser.symbols[","].leftDenotation;
-		//comma.leftDenotation = hookLog(parser, comma.leftDenotation, "Comma");
+		//parser.expression = hookLog(parser, parser.expression, "expression");
+
 		
 		parser.init();
+
+		//comma = parser.symbols["="];
+		//comma.leftDenotation = hookLog(comma, comma.leftDenotation, "Comma");
+		
 		parser.parse();
 		var output = evaluate(parser.parseTree);
 		return output;

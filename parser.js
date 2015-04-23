@@ -179,18 +179,18 @@ function Parser(tokens_) {
 					type: "function",
 					name: left.name,
 					args: left.args,
-					value: this.expression(2)
+					value: this.parser.expression(2)
 				};
 			} else if (left.type === "identifier") {
 				return {
 					type: "assign",
 					name: left.value,
-					value: this.expression(2)
+					value: this.parser.expression(2)
 				};
 			}
 			else
 				throw "Invalid lvalue";
-		}.bind(this));
+		});
 	}
 	
 	this.parse = function() {
