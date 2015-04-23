@@ -16,6 +16,8 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 
 //Object.prototype.getClass = function() { return this.constructor.name; }
 
+// todo: make HTML canvas with visual parser debugging (well, mostly for learning)
+
 function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
 	var oldSymbol = parser.symbols[id];
 	if (oldSymbol) {
