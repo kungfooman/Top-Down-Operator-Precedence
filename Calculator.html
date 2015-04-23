@@ -103,11 +103,10 @@ PrettyPrint(1,2)
 		//parser.infix = hookLog(parser, parser.infix, "infix");
 		//parser.expression = hookLog(parser, parser.expression, "expression");
 
-		
 		parser.init();
 
 		//comma = parser.symbols["="];
-		//comma.leftDenotation = hookLog(comma, comma.leftDenotation, "Comma");
+		//comma.leftDenotation = hookLog(comma, comma.leftDenotation, "Equal sign");
 		
 		parser.parse();
 		var output = evaluate(parser.parseTree);

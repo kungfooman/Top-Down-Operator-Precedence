@@ -130,19 +130,20 @@ function Parser(tokens_) {
 		});
 		
 		this.symbol("identifier", function (name) {
-			if (this.currentSymbol().type === "(") {
+			var parser = this.parser;
+			if (parser.currentSymbol().type === "(") {
 				var args = [];
-				if (this.tokens[this.i + 1].type === ")")
-					this.advanceSymbol();
+				if (parser.tokens[parser.i + 1].type === ")")
+					parser.advanceSymbol();
 				else {
 					do {
-						this.advanceSymbol();
-						args.push(this.expression(2));
-					} while (this.currentSymbol().type === ",");
-					if (this.currentSymbol().type !== ")")
+						parser.advanceSymbol();
+						args.push(parser.expression(2));
+					} while (parser.currentSymbol().type === ",");
+					if (parser.currentSymbol().type !== ")")
 						throw "Expected closing parenthesis ')'";
 				}
-				this.advanceSymbol();
+				parser.advanceSymbol();
 				return {
 					clazz_identifier: "Node Identifier",
 					type: "call",
@@ -151,15 +152,16 @@ function Parser(tokens_) {
 				};
 			}
 			return name;
-		}.bind(this));
+		});
 
 		this.symbol("(", function () {
-			value = this.expression(2);
-			if (this.currentSymbol().type !== ")")
+			var parser = this.parser;
+			value = parser.expression(2);
+			if (parser.currentSymbol().type !== ")")
 				throw "Expected closing parenthesis ')'";
-			this.advanceSymbol();
+			parser.advanceSymbol();
 			return value;
-		}.bind(this));
+		});
 
 		this.prefix("-", 7);
 		this.infix("^", 6, 5);
