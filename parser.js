@@ -9,7 +9,7 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 
 // .nud     Null denotation			== symbolCallback
 // .fud     First null denotation	== 
-// .led     Left denotation			== leftDenotation
+// .led     Left denotation			== infixCallback
 //  lbp     Left binding power		== leftBindingPower
 //  rbp     Right binding power		== rightBindingPower
 */
@@ -18,13 +18,13 @@ https://github.com/douglascrockford/JSLint/blob/master/jslint.js
 
 // todo: make HTML canvas with visual parser debugging (well, mostly for learning)
 
-function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
+function Symbol(parser, id, symbolCallback, leftBindingPower, infixCallback) {
 	var oldSymbol = parser.symbols[id];
 	if (oldSymbol) {
-		//console.log("Update: ", this.id, symbolCallback, leftBindingPower, leftDenotation);
+		//console.log("Update: ", this.id, symbolCallback, leftBindingPower, infixCallback);
 		this.symbolCallback = this.symbolCallback || symbolCallback;
 		this.leftBindingPower = this.leftBindingPower || leftBindingPower;
-		this.leftDenotation = this.leftDenotation || leftDenotation;
+		this.infixCallback = this.infixCallback || infixCallback;
 		this.symbol = oldSymbol;
 		return;
 	}
@@ -32,7 +32,7 @@ function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
 	this.id = id;
 	this.symbolCallback = symbolCallback || function(node) { throw "symbolCallback> unexpected token: " +  node.type};
 	this.leftBindingPower = leftBindingPower;
-	this.leftDenotation = leftDenotation || function(node) { throw "leftDenotation> unexpected token: " +  node.type};
+	this.infixCallback = infixCallback || function(node) { throw "infixCallback> unexpected token: " +  node.type};
 	this.parser.symbols[id] = this;
 	this.symbol = this;
 	this.clazz = "Symbol";
@@ -41,8 +41,8 @@ function Symbol(parser, id, symbolCallback, leftBindingPower, leftDenotation) {
 function Parser(tokens_) {
 	this.tokens = tokens_;
 	this.symbols = {};
-	this.symbol = function(id, symbolCallback, leftBindingPower, leftDenotation) {
-		new Symbol(this, id, symbolCallback, leftBindingPower, leftDenotation).symbol;
+	this.symbol = function(id, symbolCallback, leftBindingPower, infixCallback) {
+		new Symbol(this, id, symbolCallback, leftBindingPower, infixCallback).symbol;
 	};
 
 	this.token2symbol = function(token) {
@@ -63,14 +63,14 @@ function Parser(tokens_) {
 		while (rightBindingPower < this.currentSymbol().leftBindingPower) {
 			sym = this.currentSymbol();
 			this.advanceSymbol();
-			left = sym.leftDenotation(left);
+			left = sym.infixCallback(left);
 		}
 		return left;
 	};
 
-	this.infix = function (id, leftBindingPower, rightBindingPower, leftDenotation) {
+	this.infix = function (id, leftBindingPower, rightBindingPower, infixCallback) {
 		rightBindingPower = rightBindingPower || leftBindingPower;
-		this.symbol(id, null, leftBindingPower, leftDenotation || function (left) {
+		this.symbol(id, null, leftBindingPower, infixCallback || function (left) {
 			return {
 				clazz_infix: "Node Infix",
 				type: this.closure_infix.id,
@@ -90,7 +90,7 @@ function Parser(tokens_) {
 			id: id,
 			leftBindingPower: leftBindingPower,
 			rightBindingPower: rightBindingPower,
-			leftDenotation: leftDenotation
+			infixCallback: infixCallback
 		};
 	};
 	
