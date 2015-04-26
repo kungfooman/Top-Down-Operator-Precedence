@@ -155,5 +155,32 @@ PrettyPrint(1,2)
 		PrettyPrint(parser.parseTree, 0);
 	};
 </script>
-</body>
+
+<canvas id="myCanvas" width="578" height="200"></canvas>
+<script>
+var canvas = document.getElementById('myCanvas');
+var context = canvas.getContext('2d');
+
+function line(from_left, from_top, to_left, to_top) {
+	context.beginPath();
+	context.moveTo(from_left, from_top);
+	context.lineTo(to_left, to_top);
+	context.stroke();
+}
+
+function text(text, left, top) {
+	context.font = '20pt Calibri';
+	context.fillStyle = 'blue';
+	context.fillText(text, left, top);
+}
+
+text("100 10", 100, 10);
+text("10 100", 10, 100);
+line(100, 10, 10, 100);
+</script>
+
+<button onclick="context.clearRect(0, 0, canvas.width, canvas.height);">Clear Canvas</button>
+		
+
+	</body>
 </html>
