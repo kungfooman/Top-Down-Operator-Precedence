@@ -3,6 +3,23 @@ function PrettyPrintHTML(node, depth)
 	var indent = "  ".repeat(depth);
 	var tmp = "";
 	var add = function(str) { tmp += str; }
+	var table = function() {
+		tmp = "";
+		add("<table>")
+		for (var row in arguments) {
+			add("<tr>")
+			for (var col in arguments[row]) {
+				add("<td>")
+				add(arguments[row][col]);
+				add("</td>")
+			}
+			add("</tr>")
+		}
+		add("</table>")
+		return tmp;
+	}	
+	
+	
 	if (typeof node == "undefined")
 		return "null";
 	
@@ -34,25 +51,12 @@ function PrettyPrintHTML(node, depth)
 		case "/":
 		case "%":
 		case "^": {
-			add("<table>");
-				add("<tr>");
-					add("<td>");
-			
-						//add"node.type=" + node.type;
-						add(node.type);
-						
-						add("<table>");
-							add("<tr>");
-								add("<td>");
-								add(PrettyPrintHTML(node.left, depth + 1));
-								add("<td>");
-								add(PrettyPrintHTML(node.right, depth + 1));
-							add("</tr>");
-						add("</table>");
-
-					add("</td>");
-				add("</tr>");
-			add("</table>");
+			table([
+				node.type + table([
+					PrettyPrintHTML(node.left, depth + 1),
+					PrettyPrintHTML(node.right, depth + 1)
+				])
+			]);
 			return tmp;
 		}
 		
@@ -67,10 +71,10 @@ function PrettyPrintHTML(node, depth)
 				add("<td>");
 				//print((indent + "node.statement["+ i +"]:");
 				add(PrettyPrintHTML(node.statements[i], depth + 1));
+				add("</tr>");
 			}
 			
 			add("</table>");
-			add("</tr>");
 			return tmp;
 		}
 		
