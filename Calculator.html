@@ -6,11 +6,34 @@
 		td {
 			vertical-align: top;
 		}
+		
+		* {
+			//spadding: 0;
+			//smargin: 0;
+		}
+		table, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+			text-align: center;
+		}
+		
+		body {
+			//color: white;
+			font-size: 1.2em;
+			font-weight: bold;
+		}
+		
+		td {
+			//background-color: red;
+			//background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+			background: linear-gradient(to right, red, orange, yellow, lime, violet);
+			//background: linear-gradient(to right, lime, yellow, lime);
+		}
 	</style>
 </head>
 <body>
 
-	<table border=1>
+	<table>
 		<tr>
 			<td>
 
@@ -39,6 +62,7 @@ PrettyPrint(1,2)
 				<button id="prettyprint">PrettyPrint</button><br>
 				<button id="clear">Clear</button><br>
 				<button id="prettyprintselection">PrettyPrint Selection</button>
+				<button id="prettyprinthtml">PrettyPrintHTML</button>
 			<td>
 				<pre id="output" style="min-width:100px; border: 1px solid black"></pre>
 		<tr>
@@ -47,6 +71,7 @@ PrettyPrint(1,2)
 <script src="lexer.js"></script>
 <script src="parser.js"></script>
 <script src="evaluator.js"></script>
+<script src="PrettyPrintHTML.js"></script>
 <script>
 	function getArgs(func) {
 		var s;
@@ -158,6 +183,18 @@ PrettyPrint(1,2)
 		parser.init();
 		parser.parse();
 		PrettyPrint(parser.parseTree, 0);
+	};
+	document.getElementById("prettyprinthtml").onclick = function () {
+		var input = getInput();
+		//print("Selection: <div class=selection>" + input + "</div>");
+		
+		//output = calculate(input);
+		
+		var tokens = lex(input);
+		parser = new Parser(tokens);
+		parser.init();
+		parser.parse();
+		print(PrettyPrintHTML(parser.parseTree, 0));
 	};
 </script>
 
