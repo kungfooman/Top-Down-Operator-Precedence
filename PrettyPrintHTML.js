@@ -1,23 +1,31 @@
 function PrettyPrintHTML(node, depth)
 {
 	var indent = "  ".repeat(depth);
-	var tmp = "<div style='padding-left: 10px'>";
-	
+	var tmp = "";
+	var add = function(str) { tmp += str; }
 	if (typeof node == "undefined")
-		return "node==undefined";
+		return "null";
 	
 	switch (node.type) {
 		case "call": {
-			//tmp += ("" + node.type + "=" + node.name);
-			tmp += (node.name);
-			for (var i = 0; i < node.args.length; i++) {
-				tmp += PrettyPrintHTML(node.args[i], depth + 1);
-			}
+			//add("" + node.type + "=" + node.name);
+			add(node.name + "(");
+			
+			add("<table>");
+				for (var i = 0; i < node.args.length; i++) {
+					add("<tr>");
+						add("<td>");
+							add("args["+i+"]");
+						add("<td>");
+							add(PrettyPrintHTML(node.args[i], depth + 1));
+					add("</tr>");
+				}
+			add("</table>);");
 			return tmp;
 		}
 		case "number": {
-			//tmp += ("" + node.type + "=" + node.value);
-			tmp += (node.value);
+			//add("" + node.type + "=" + node.value);
+			add(node.value);
 			return tmp;
 		}
 		case "+":
@@ -26,58 +34,56 @@ function PrettyPrintHTML(node, depth)
 		case "/":
 		case "%":
 		case "^": {
-			var tmp = "";
+			add("<table>");
+				add("<tr>");
+					add("<td>");
 			
-			tmp += ("<table>");
-				tmp += ("<tr>");
-					tmp += ("<td>");
-			
-						//tmp += "node.type=" + node.type;
-						tmp += (node.type);
+						//add"node.type=" + node.type;
+						add(node.type);
 						
-						tmp += ("<table>");
-							tmp += ("<tr>");
-								tmp += ("<td>");
-								tmp += PrettyPrintHTML(node.left, depth + 1);
-								tmp += ("<td>");
-								tmp += PrettyPrintHTML(node.right, depth + 1);				
-							tmp += ("</tr>");
-						tmp += ("</table>");
+						add("<table>");
+							add("<tr>");
+								add("<td>");
+								add(PrettyPrintHTML(node.left, depth + 1));
+								add("<td>");
+								add(PrettyPrintHTML(node.right, depth + 1));
+							add("</tr>");
+						add("</table>");
 
-					tmp += ("</td>");					
-				tmp += ("</tr>");
-			tmp += ("</table>");
+					add("</td>");
+				add("</tr>");
+			add("</table>");
 			return tmp;
 		}
 		
 		case "statements": {
-			tmp += ("node.type=" + node.type + " node.value=" + node.value);
+			add("node.type=" + node.type + " node.value=" + node.value);
 			
-			tmp += ("<table>");
+			add("<table>");
 			
 			for (var i = 0; i < node.statements.length; i++) {
-				tmp += ("<tr>");
-				tmp += ("<td>node.statements["+i+"]");
-				tmp += ("<td>");
+				add("<tr>");
+				add("<td>node.statements["+i+"]");
+				add("<td>");
 				//print((indent + "node.statement["+ i +"]:");
-				tmp += PrettyPrintHTML(node.statements[i], depth + 1);
+				add(PrettyPrintHTML(node.statements[i], depth + 1));
 			}
 			
-			tmp += ("</table>");
-			tmp += ("</tr>");
+			add("</table>");
+			add("</tr>");
 			return tmp;
 		}
 		
 		default:
 		
-			return "default: " + node.type + "</div>";
+			return "default: " + node.type;
 		
 			nonewline = function(msg) { return msg.replace(/\r\n/g, " ").replace(/\n/g, " "); }
 			tmp = "";
 			for (key in node) {
 				if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 					continue;
-				tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
+				add("<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ");
 			}
 			//print((indent + nonewline(tmp));
 			if (typeof node.symbol != "undefined") {
@@ -87,31 +93,10 @@ function PrettyPrintHTML(node, depth)
 				for (key in node.symbol) {
 					if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 						continue;
-					tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
+					add("<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ");
 				}
 				//print((indent + nonewline(tmp));
 				
-			}
-			if (typeof node.left != "undefined") {
-				//print((indent + "node.left:");
-				PrettyPrintHTML(node.left, depth + 1);
-			}
-			if (typeof node.right != "undefined") {
-				//print((indent + "node.right:");
-				PrettyPrintHTML(node.right, depth + 1);
-			}
-			if (typeof node.args != "undefined") {
-				//print((indent + "node.args:");
-				for (var i = 0; i < node.args.length; i++) {
-					PrettyPrintHTML(node.args[i], depth + 1);
-				}
-			}
-			if (typeof node.statements != "undefined") {
-				//print((indent + "node.statements:");
-				for (var i = 0; i < node.statements.length; i++) {
-					//print((indent + "node.statement["+ i +"]:");
-					PrettyPrintHTML(node.statements[i], depth + 1);
-				}
 			}
 			break;
 	}
