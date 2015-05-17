@@ -5,7 +5,7 @@ function PrettyPrintHTML(node, depth)
 	var add = function(str) { tmp += str; }
 	var table = function() {
 		tmp = "";
-		add("<table>")
+		add("<table class=prettyprinthtml>")
 		for (var row in arguments) {
 			add("<tr>")
 			for (var col in arguments[row]) {
@@ -28,7 +28,7 @@ function PrettyPrintHTML(node, depth)
 			//add("" + node.type + "=" + node.name);
 			add(node.name + "(");
 			
-			add("<table>");
+			add("<table class=prettyprinthtml>");
 				for (var i = 0; i < node.args.length; i++) {
 					add("<tr>");
 						add("<td>");
@@ -63,7 +63,7 @@ function PrettyPrintHTML(node, depth)
 		case "statements": {
 			add("node.type=" + node.type + " node.value=" + node.value);
 			
-			add("<table>");
+			add("<table class=prettyprinthtml>");
 			
 			for (var i = 0; i < node.statements.length; i++) {
 				add("<tr>");

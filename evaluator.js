@@ -109,7 +109,7 @@ function PrettyPrint(node, depth)
 			for (key in node) {
 				if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 					continue;
-				tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
+				tmp += "<b class=prettyprinttext>node." + key + "</b>=<b class=prettyprinttext>" + node[key] + "</b> ";
 			}
 			print(indent + nonewline(tmp));
 			if (typeof node.symbol != "undefined") {
@@ -119,7 +119,7 @@ function PrettyPrint(node, depth)
 				for (key in node.symbol) {
 					if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
 						continue;
-					tmp += "<b style=color:red>node." + key + "</b>=<b style=color:red>" + node[key] + "</b> ";
+					tmp += "<b class=prettyprinttext>node." + key + "</b>=<b class=prettyprinttext>" + node[key] + "</b> ";
 				}
 				print(indent + nonewline(tmp));
 				
