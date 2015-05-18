@@ -10,8 +10,8 @@ function HTML() {
 		this.source += "<tr>";
 		return this;
 	}
-	this.td = function(text) {
-		this.source += "<td>" + text + "</td>";
+	this.td = function(text, attributes) {
+		this.source += "<td " + attributes + ">" + text + "</td>";
 		return this;
 	}
 	this.add = function(text) {

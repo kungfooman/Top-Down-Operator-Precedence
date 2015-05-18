@@ -51,6 +51,24 @@ function PrettyPrintHTML(node, depth)
 			return html.toString();
 		}
 		
+		case "assign": {
+			html.table("class=prettyprinthtml");
+			html.tr();
+			html.td("=", "colspan=2");
+			html.tr();
+			html.td(node.name);
+			html.td(PrettyPrintHTML(node.value, depth + 1));
+			return html.toString();
+		}
+		
+		case "identifier": {
+			html.table("class=prettyprinthtml");
+			html.tr();
+			//html.td("name");
+			html.td(node.value);
+			return html.toString();
+		}
+		
 		default:
 		
 			//return "default: " + node.type;
