@@ -73,6 +73,7 @@ PrettyPrint(1,2)
 				<button id="prettyprintselection">PrettyPrint Selection</button><br>
 				<button id="prettyprinthtml">PrettyPrintHTML</button><br>
 				<button id="tokentable">TokenTable</button><br>
+				<button id="parsestepselection">ParseStepSelection</button><br>
 			<td>
 				<pre id="output" style="min-width:100px; border: 1px solid black"></pre>
 		<tr>
@@ -124,7 +125,11 @@ PrettyPrint(1,2)
 			tmp += "}";
 		
 		tmp += "}";
-		return eval(tmp)(obj, oldFunc, funcname);
+		var newFunc = eval(tmp)(obj, oldFunc, funcname);
+		// FireBug: parser.expression.oldFunc.toSource()
+		// Idea: s/arguments.keys()/arguments.values() and just print it, for debugging the actual values directly in source
+		newFunc.oldFunc = oldFunc;
+		return newFunc;
 	}
 	
 	var calculate = function (input) {
@@ -132,13 +137,13 @@ PrettyPrint(1,2)
 		//var parseTree = parse(tokens);
 		parser = new Parser(tokens);
 		
-		//parser.infix = hookLog(parser, parser.infix, "infix");
-		//parser.expression = hookLog(parser, parser.expression, "expression");
+		parser.infix = hookLog(parser, parser.infix, "infix");
+		parser.expression = hookLog(parser, parser.expression, "expression");
 
 		parser.init();
 
-		//comma = parser.symbols["="];
-		//comma.leftDenotation = hookLog(comma, comma.leftDenotation, "Equal sign");
+		comma = parser.symbols["="];
+		comma.infixCallback = hookLog(comma, comma.infixCallback, "Equal sign");
 		
 		parser.parse();
 		var output = evaluate(parser.parseTree);
@@ -234,6 +239,23 @@ PrettyPrint(1,2)
 		}
 		print(html.source);
 	};
+	document.getElementById("parsestepselection").onclick = function () {
+		var input = getSelectedInput();
+		print("Selection: <div class=selection>" + input + "</div>");
+		//print("Selection: <div class=selection>" + input + "</div>");
+		
+		//output = calculate(input);
+		
+		var tokens = lex(input);
+		parser = new Parser(tokens);
+		parser.init();
+		//parser.parse();
+		//print(PrettyPrintHTML(parser.parseTree, 0));
+		
+		print("Tokens: " + tokens.length)
+	};
+	
+	
 </script>
 
 <script src="lexer.js"></script>
