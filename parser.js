@@ -31,7 +31,7 @@ function Symbol(parser, id, symbolCallback, leftBindingPower, infixCallback) {
 	this.parser = parser;
 	this.id = id;
 	this.symbolCallback = symbolCallback || function(node) { throw "symbolCallback> unexpected token: " +  node.type};
-	this.leftBindingPower = leftBindingPower;
+	this.leftBindingPower = leftBindingPower || 0;
 	this.infixCallback = infixCallback || function(node) { throw "infixCallback> Missing Operator (unexpected token): " +  node.type};
 	this.parser.symbols[id] = this;
 	this.symbol = this;

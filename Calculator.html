@@ -70,17 +70,15 @@ PrettyPrint(1,2)
 				<button id="calculate">Calculate</button><br>
 				<button id="prettyprint">PrettyPrint</button><br>
 				<button id="clear">Clear</button><br>
-				<button id="prettyprintselection">PrettyPrint Selection</button>
-				<button id="prettyprinthtml">PrettyPrintHTML</button>
+				<button id="prettyprintselection">PrettyPrint Selection</button><br>
+				<button id="prettyprinthtml">PrettyPrintHTML</button><br>
+				<button id="tokentable">TokenTable</button><br>
 			<td>
 				<pre id="output" style="min-width:100px; border: 1px solid black"></pre>
 		<tr>
 	</table>
 
-<script src="lexer.js"></script>
-<script src="parser.js"></script>
-<script src="evaluator.js"></script>
-<script src="PrettyPrintHTML.js"></script>
+
 <script>
 	function getArgs(func) {
 		var s;
@@ -205,7 +203,44 @@ PrettyPrint(1,2)
 		parser.parse();
 		print(PrettyPrintHTML(parser.parseTree, 0));
 	};
+	document.getElementById("tokentable").onclick = function () {
+		var input = getInput();
+		//print("Selection: <div class=selection>" + input + "</div>");
+		
+		//output = calculate(input);
+		
+		var tokens = lex(input);
+		parser = new Parser(tokens);
+		parser.init();
+		//parser.parse();
+		//print(PrettyPrintHTML(parser.parseTree, 0));
+		
+		var html = new HTML().table().tr().td("type").td("value").td("lbp").td("inf<br>rbp").td("pre<br>rbp");
+		for (i in tokens) {
+			t = tokens[i];
+			sym = parser.symbols[t.type];
+			html.tr();
+			html.td(t.type);
+			html.td(t.value || "");
+			html.td(sym.leftBindingPower);
+			if (sym.closure_infix)
+				html.td(sym.closure_infix.rightBindingPower);
+			else
+				html.td("");
+			if (sym.closure_prefix)
+				html.td(sym.closure_prefix.rightBindingPower);
+			else
+				html.td("");
+		}
+		print(html.source);
+	};
 </script>
+
+<script src="lexer.js"></script>
+<script src="parser.js"></script>
+<script src="evaluator.js"></script>
+<script src="PrettyPrintHTML.js"></script>
+<script src="HTML.js"></script>
 
 <!--
 <button onclick="context.clearRect(0, 0, canvas.width, canvas.height)">Clear Canvas</button>
