@@ -5,7 +5,7 @@
 // Douglas Crockford
 // 2010-06-26
 
-var make_parse = function () {
+function Parser() {
     var scope;
     var symbol_table = {};
     var token;
@@ -517,8 +517,8 @@ var make_parse = function () {
         return this;
     });
 
-    return function (source) {
-        tokens = source.tokens('=<>!+-*&|/%^', '=<>&|');
+    this.parse = function (source) {
+        tokens = new Lexer(source, '=<>!+-*&|/%^', '=<>&|').result;
         token_nr = 0;
         new_scope();
         advance();
