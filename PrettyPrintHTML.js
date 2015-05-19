@@ -6,19 +6,18 @@ function PrettyPrintHTML(node, depth)
 		return "null";
 
 	switch (node.type) {
-		case "call": {
-			//add("" + node.type + "=" + node.name);
-			html.add(node.name + "(");
+		case "statements": {
 			html.table("class=prettyprinthtml");
-			for (var i = 0; i < node.args.length; i++) {
+			for (var i = 0; i < node.statements.length; i++) {
 				html.tr();
-				html.td("args["+i+"]");
-				html.td(PrettyPrintHTML(node.args[i], depth + 1));
+				//html.td("node.statements[" + i + "]");
+				html.td("#" + i);
+				html.td(PrettyPrintHTML(node.statements[i], depth + 1));
 			}
 			return html.toString();
 		}
+	
 		case "number": {
-			//html.add("" + node.type + "=" + node.value);
 			html.add(node.value);
 			return html.toString();
 		}
@@ -28,29 +27,15 @@ function PrettyPrintHTML(node, depth)
 		case "/":
 		case "%":
 		case "^": {
-			html.add(
-				table([
-					node.type + table([
-						PrettyPrintHTML(node.left, depth + 1),
-						PrettyPrintHTML(node.right, depth + 1)
-					])
-				])
-			);
-			return html.toString();
-		}
-		
-		case "statements": {
 			html.table("class=prettyprinthtml");
-			//html.add("node.type=" + node.type + " node.value=" + node.value);
-			for (var i = 0; i < node.statements.length; i++) {
-				html.tr();
-				//html.td("node.statements[" + i + "]");
-				html.td("#" + i);
-				html.td(PrettyPrintHTML(node.statements[i], depth + 1));
-			}
+			html.tr();
+			html.td(node.type, "colspan=2");
+			html.tr();
+			html.td(PrettyPrintHTML(node.left, depth + 1));
+			html.td(PrettyPrintHTML(node.right, depth + 1));
 			return html.toString();
 		}
-		
+
 		case "assign": {
 			html.table("class=prettyprinthtml");
 			html.tr();
@@ -58,6 +43,34 @@ function PrettyPrintHTML(node, depth)
 			html.tr();
 			html.td(node.name);
 			html.td(PrettyPrintHTML(node.value, depth + 1));
+			return html.toString();
+		}
+		
+		case "call": {
+			html.table("class=prettyprinthtml");
+			html.tr();
+			html.td("call");
+			html.td(node.name);
+			for (var i = 0; i < node.args.length; i++) {
+				html.tr();
+				html.td("args #" + i);
+				html.td(PrettyPrintHTML(node.args[i], depth + 1));
+			}
+			return html.toString();
+		}
+		
+		case "function": {
+			html.table("class=prettyprinthtml");
+			html.tr();
+			html.td("function");
+			html.td(node.name);
+			for (var i = 0; i < node.args.length; i++) {
+				html.tr();
+				html.td("args #" + i);
+				html.td(node.args[i].value);
+			}
+			html.tr();
+			html.td(PrettyPrintHTML(node.value, depth + 1), "colspan=2");
 			return html.toString();
 		}
 		
