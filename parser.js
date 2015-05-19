@@ -112,6 +112,7 @@ function Parser(tokens_) {
 	this.init = function() {
 		this.symbol(",");
 		this.symbol(")");
+		this.symbol("}");
 		this.symbol("(end)");
 
 		this.symbol("number", function (number) {
@@ -157,6 +158,15 @@ function Parser(tokens_) {
 		});
 
 		this.symbol("(", function () {
+			var parser = this.parser;
+			value = parser.expression(2);
+			if (parser.currentSymbol().type !== ")")
+				throw "Expected closing parenthesis ')'";
+			parser.advanceSymbol();
+			return value;
+		});
+		
+		this.symbol("{", function () {
 			var parser = this.parser;
 			value = parser.expression(2);
 			if (parser.currentSymbol().type !== ")")
