@@ -11,6 +11,8 @@ function Parser() {
     var token;
     var tokens;
     var token_nr;
+	
+	this.eval = function(str) { return eval(str); }
 
     var itself = function () {
         return this;
