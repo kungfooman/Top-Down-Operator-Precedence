@@ -1,14 +1,16 @@
-<html><head>
-<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title>Top Down Operator Precedence</title>
-<style>
-pre {margin-left: 4em; margin-right: 4em;}
-</style></head><body style="margin: 8%;" bgcolor="linen">
-<h1>Top Down Operator Precedence</h1>
-
-<p><a href="http://www.crockford.com/">Douglas Crockford</a></p>
-
-<p>2007-02-21</p>
-<h2>Introduction</h2>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title>Top Down Operator Precedence</title>
+		<style>
+			body { margin: 8% !important; }
+		</style>
+		<link rel="stylesheet" href="bootstrap.min.css">
+	</head>
+	<body>
+		<h1>Top Down Operator Precedence</h1>
+		<p><a href="http://www.crockford.com/">Douglas Crockford</a></p>
+		<p>2007-02-21</p>
+		<h2>Introduction</h2>
 
 <p><a href="http://boole.stanford.edu/pratt.html">Vaughan Pratt</a> presented
   <a href="http://portal.acm.org/citation.cfm?id=512931">"Top Down Operator
@@ -34,12 +36,13 @@ pre {margin-left: 4em; margin-right: 4em;}
   But parsing techniques are not greatly valued in the LISP community, which
   celebrates the Spartan denial of syntax. There have been many attempts
   since LISP's creation to give the language a rich ALGOL-like syntax, including
-  <a href="http://zane.brouhaha.com/%7Ehealyzh/doc/cgol.doc.txt">Pratt's
-  CGOL</a>, <a href="http://community.computerhistory.org/scc/projects/LISP/index.html#LISP_2_">LISP
-  2</a>, <a href="ftp://reports.stanford.edu/pub/cstr/reports/cs/tr/68/92/CS-TR-68-92.pdf">MLISP</a>,
-  <a href="http://www.opendylan.org/">Dylan</a>, <a href="http://community.computerhistory.org/scc/projects/LISP/interlisp/Teitelman-3IJCAI.pdf">Interlisp's
-  Clisp</a>, and <a href="http://www-formal.stanford.edu/jmc/history/lisp/lisp.html">McCarthy's
-  original M-expressions</a>. All failed to find acceptance. That community
+  <a href="http://zane.brouhaha.com/%7Ehealyzh/doc/cgol.doc.txt">Pratt's CGOL</a>,
+  <a href="http://community.computerhistory.org/scc/projects/LISP/index.html#LISP_2_">LISP 2</a>,
+  <a href="ftp://reports.stanford.edu/pub/cstr/reports/cs/tr/68/92/CS-TR-68-92.pdf">MLISP</a>,
+  <a href="http://www.opendylan.org/">Dylan</a>,
+  <a href="http://community.computerhistory.org/scc/projects/LISP/interlisp/Teitelman-3IJCAI.pdf">Interlisp's Clisp</a> and
+  <a href="http://www-formal.stanford.edu/jmc/history/lisp/lisp.html">McCarthy's original M-expressions</a>.
+  All failed to find acceptance. That community
   found the correspondence between programs and data to be much more valuable
   than expressive syntax. But the mainstream programming community likes
   its syntax, so LISP has never been accepted by the mainstream. Pratt's
@@ -345,7 +348,12 @@ instance of the original scope prototype.</p>
   and an infix operator (subtraction), so it would have both <code>nud</code>
   and <code>led</code> methods. </p>
 <p>In our parser, we will use these binding powers:</p>
-<table border="2" align="center"><tbody>
+<style>
+	.operators td {
+		padding: 5px;
+	}
+</style>
+<table class="operators" border="2" align="center"><tbody>
   <tr>
     <td>0</td>
     <td>non-binding operators like <code><code>;</code></code></td>
