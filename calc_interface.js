@@ -1,18 +1,18 @@
 var calculate = function (input) {
 	var tokens = lex(input);
 	//var parseTree = parse(tokens);
-	parser = new Parser(tokens);
+	calc_parser = new Parser(tokens);
 	
-	parser.infix = hookLog(parser, parser.infix, "infix");
-	parser.expression = hookLog(parser, parser.expression, "expression");
+	//calc_parser.infix = hookLog(calc_parser, calc_parser.infix, "infix");
+	//calc_parser.expression = hookLog(calc_parser, calc_parser.expression, "expression");
 
-	parser.init();
+	calc_parser.init();
 
-	comma = parser.symbols["="];
-	comma.infixCallback = hookLog(comma, comma.infixCallback, "Equal sign");
+	//comma = parser.symbols["="];
+	//comma.infixCallback = hookLog(comma, comma.infixCallback, "Equal sign");
 	
-	parser.parse();
-	var output = evaluate(parser.parseTree);
+	calc_parser.parse();
+	var output = evaluate(calc_parser.parseTree);
 	return output;
 };
 
@@ -33,63 +33,64 @@ function getSelectedInput() {
 	return textarea.value.substring(s,e);
 }
 
-document.getElementById("calculate").onclick = function () {
-	output = calculate(getInput());
+function calc_calculate() {
+	var output = calculate(getInput());
 	print("\nStatement evaluations: \n" + output);
-};
-document.getElementById("clear").onclick = function () {
+}
+function calc_clear() {
 	clear()
-};
-document.getElementById("prettyprint").onclick = function () {
-	output = calculate(getInput());
+}
+function calc_prettyprint() {
+	var output = calculate(getInput());
 	
 	var tokens = lex(getInput());
-	parser = new Parser(tokens);
-	parser.init();
-	parser.parse();
+	calc_parser = new Parser(tokens);
+	calc_parser.init();
+	calc_parser.parse();
 	
-	PrettyPrint(parser.parseTree, 0);
-};
-document.getElementById("prettyprintselection").onclick = function () {
+	PrettyPrint(calc_parser.parseTree, 0);
+}
+function calc_prettyprintselection() {
 	var input = getSelectedInput();
 	print("Selection: <div class=selection>" + input + "</div>");
 	
-	output = calculate(input);
+	var output = calculate(input);
 	
 	var tokens = lex(input);
-	parser = new Parser(tokens);
-	parser.init();
-	parser.parse();
-	PrettyPrint(parser.parseTree, 0);
-};
-document.getElementById("prettyprinthtml").onclick = function () {
+	calc_parser = new Parser(tokens);
+	calc_parser.init();
+	calc_parser.parse();
+	PrettyPrint(calc_parser.parseTree, 0);
+}
+function calc_prettyprinthtml() {
 	var input = getInput();
 	//print("Selection: <div class=selection>" + input + "</div>");
 	
-	//output = calculate(input);
+	//var output = calculate(input);
 	
 	var tokens = lex(input);
-	parser = new Parser(tokens);
-	parser.init();
-	parser.parse();
-	print(PrettyPrintHTML(parser.parseTree, 0));
-};
-document.getElementById("tokentable").onclick = function () {
+	calc_parser = new Parser(tokens);
+	 
+	calc_parser.init();
+	calc_parser.parse();
+	print(PrettyPrintHTML(calc_parser.parseTree, 0));
+}
+function calc_tokentable() {
 	var input = getInput();
 	//print("Selection: <div class=selection>" + input + "</div>");
 	
-	//output = calculate(input);
+	//var output = calculate(input);
 	
 	var tokens = lex(input);
-	parser = new Parser(tokens);
-	parser.init();
+	calc_parser = new Parser(tokens);
+	calc_parser.init();
 	//parser.parse();
-	//print(PrettyPrintHTML(parser.parseTree, 0));
+	//print(PrettyPrintHTML(calc_parser.parseTree, 0));
 	
 	var html = new HTML().table().tr().td("type").td("value").td("lbp").td("inf<br>rbp").td("pre<br>rbp");
 	for (i in tokens) {
 		t = tokens[i];
-		sym = parser.symbols[t.type];
+		sym = calc_parser.symbols[t.type];
 		html.tr();
 		html.td(t.type);
 		html.td(t.value || "");
@@ -104,19 +105,19 @@ document.getElementById("tokentable").onclick = function () {
 			html.td("");
 	}
 	print(html.source);
-};
-document.getElementById("parsestepselection").onclick = function () {
+}
+function calc_parsestepselection() {
 	var input = getSelectedInput();
 	print("Selection: <div class=selection>" + input + "</div>");
 	//print("Selection: <div class=selection>" + input + "</div>");
 	
-	//output = calculate(input);
+	//var output = calculate(input);
 	
 	var tokens = lex(input);
-	parser = new Parser(tokens);
-	parser.init();
-	//parser.parse();
-	//print(PrettyPrintHTML(parser.parseTree, 0));
+	calc_parser = new Parser(tokens);
+	calc_parser.init();
+	//calc_parser.parse();
+	//print(PrettyPrintHTML(calc_parser.parseTree, 0));
 	
 	print("Tokens: " + tokens.length)
-};
+}
