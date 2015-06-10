@@ -1,11 +1,5 @@
-// parse.js
-// Parser for Simplified JavaScript written in Simplified JavaScript
-// From Top Down Operator Precedence
-// http://javascript.crockford.com/tdop/index.html
-// Douglas Crockford
-// 2010-06-26
 
-function Parser() {
+function MiniJS_Parser() {
     var scope;
     var symbol_table = {};
     var token;
