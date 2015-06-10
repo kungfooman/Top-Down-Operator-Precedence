@@ -1,0 +1,40 @@
+* {
+	//padding: 0;
+	//margin: 0;
+}
+
+body {
+	margin: 8% !important;
+}
+
+td {
+	border: 1px solid black;
+	vertical-align: top;
+}
+
+#minijs_INPUT {
+	border: 2px solid black;
+	color: black;
+	font-family: monospace;
+	height: 3in;
+	overflow: auto;
+	padding: 0.5em;
+	width: 100%;
+}
+
+.prettyprinthtml td {
+	//background-color: red;
+	//background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+	//background: linear-gradient(to right, red, orange, yellow, lime, violet);
+	background: linear-gradient(to right, rgba(169,228,247,1) 0%,rgba(242,237,244,1) 50%,rgba(169,228,247,1) 100%);
+	//background: linear-gradient(135deg, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%);
+}
+
+.prettyprinthtml {
+	text-align: center;
+}
+
+.prettyprinttext {
+	text-decoration: underline;
+	text-color: red;
+}

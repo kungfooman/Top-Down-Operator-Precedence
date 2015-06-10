@@ -1,54 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Calculator</title>
-	<style>
-		td {
-			vertical-align: top;
-		}
-		
-		* {
-			//spadding: 0;
-			//smargin: 0;
-		}
-		table, td {
-			border: 2px solid black;
-			//border-collapse: collapse;
-		}
-		
-		body {
-			//color: white;
-			//font-size: 2em !important;
-			//font-weight: bold;
-		}
-		
-		.prettyprinthtml td {
-			//background-color: red;
-			//background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-			//background: linear-gradient(to right, red, orange, yellow, lime, violet);
-			background: linear-gradient(to right, rgba(169,228,247,1) 0%,rgba(242,237,244,1) 50%,rgba(169,228,247,1) 100%);
-			//background: linear-gradient(135deg, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%);
-		}
-		
-		.prettyprinthtml {
-			text-align: center;
-		}
-		
-		.prettyprinttext {
-			text-decoration: underline;
-			text-color: red;
-		}
-	</style>
-	
+	<head>
+		<title>Calculator</title>
 		<link rel="stylesheet" href="bootstrap.min.css">
+		<link rel="stylesheet" href="style.css">
 	</head>
-<body>
-
-	<table>
-		<tr>
-			<td>
-
-				<textarea id="input" rows="20" cols="50">
+	<body>
+		<table>
+			<tr>
+				<td>
+					<textarea id="input" rows="20" cols="50">
 3
 2 ^ 8
 (12 % 7) * (3 + 2)
@@ -67,22 +28,22 @@ cylinderVolume(r, h) = pi * r ^ 2 * h
 cylinderVolume(2, 4)
 
 PrettyPrint(1,2)
-				</textarea>
-			<td>
-				<button id="calculate">Calculate</button><br>
-				<button id="prettyprint">PrettyPrint</button><br>
-				<button id="clear">Clear</button><br>
-				<button id="prettyprintselection">PrettyPrint Selection</button><br>
-				<button id="prettyprinthtml">PrettyPrintHTML</button><br>
-				<button id="tokentable">TokenTable</button><br>
-				<button id="parsestepselection">ParseStepSelection</button><br>
-			<td>
+					</textarea>
+				<td>
+					<button id="calculate">Calculate</button><br>
+					<button id="prettyprint">PrettyPrint</button><br>
+					<button id="clear">Clear</button><br>
+					<button id="prettyprintselection">PrettyPrint Selection</button><br>
+					<button id="prettyprinthtml">PrettyPrintHTML</button><br>
+					<button id="tokentable">TokenTable</button><br>
+					<button id="parsestepselection">ParseStepSelection</button><br>
+				<td>
 				<pre id="output" style="min-width:100px; border: 1px solid black"></pre>
-		<tr>
-	</table>
+			<tr>
+		</table>
 
 
-<script>
+		<script>
 	function getArgs(func) {
 		var s;
 		s = func.toString();
@@ -258,13 +219,13 @@ PrettyPrint(1,2)
 	};
 	
 	
-</script>
+		</script>
 
-<script src="lexer.js"></script>
-<script src="parser.js"></script>
-<script src="evaluator.js"></script>
-<script src="PrettyPrintHTML.js"></script>
-<script src="HTML.js"></script>
+		<script src="lexer.js"></script>
+		<script src="parser.js"></script>
+		<script src="evaluator.js"></script>
+		<script src="PrettyPrintHTML.js"></script>
+		<script src="HTML.js"></script>
 
 <!--
 <button onclick="context.clearRect(0, 0, canvas.width, canvas.height)">Clear Canvas</button>
