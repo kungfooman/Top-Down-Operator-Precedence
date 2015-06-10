@@ -18,7 +18,7 @@ function go(source) {
 		string = JSON.stringify(e, ['name', 'message', 'from', 'to', 'key',
 				'value', 'arity', 'first', 'second', 'third', 'fourth'], 4);
 	}
-	document.getElementById('OUTPUT').innerHTML = string
+	document.getElementById('minijs_output').innerHTML = string
 		.replace(/&/g, '&amp;')
 		.replace(/[<]/g, '&lt;');
 }
@@ -27,9 +27,9 @@ function go(source) {
 go(input());
 
 function input() {
-	return document.getElementById('minijs_INPUT').value;
+	return document.getElementById('minijs_input').value;
 }
 
-document.getElementById('PARSE').onclick = function (e) {
+document.getElementById('minijs_parse').onclick = function (e) {
 	go(input());
 };
