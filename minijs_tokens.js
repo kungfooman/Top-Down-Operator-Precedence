@@ -22,7 +22,7 @@
 
 
 
-function Lexer(input, prefix, suffix) {
+function MiniJS_Lexer(input, prefix, suffix) {
     var c;                      // The current character.
     var from;                   // The index of the start of the token.
     var i = 0;                  // The index of the current character.

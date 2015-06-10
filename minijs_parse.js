@@ -514,7 +514,7 @@ function MiniJS_Parser() {
     });
 
     this.parse = function (source) {
-        tokens = new Lexer(source, '=<>!+-*&|/%^', '=<>&|').result;
+        tokens = new MiniJS_Lexer(source, '=<>!+-*&|/%^', '=<>&|').result;
         token_nr = 0;
         new_scope();
         advance();
