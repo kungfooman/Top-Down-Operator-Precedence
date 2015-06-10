@@ -22,7 +22,7 @@ function minijs_go(source) {
 	minijs_print(string);
 }
 
-//minijs_go("var make_parse = " + make_parse.toSource() + ";");
+//minijs_go("var MiniJS_Parser = " + MiniJS_Parser.toSource() + ";");
 minijs_go(minijs_input());
 
 function minijs_input() {
