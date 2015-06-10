@@ -12,16 +12,6 @@ td {
 	vertical-align: top;
 }
 
-#minijs_input {
-	border: 2px solid black;
-	color: black;
-	font-family: monospace;
-	height: 3in;
-	overflow: auto;
-	padding: 0.5em;
-	width: 100%;
-}
-
 .prettyprinthtml td {
 	//background-color: red;
 	//background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
@@ -37,4 +27,17 @@ td {
 .prettyprinttext {
 	text-decoration: underline;
 	text-color: red;
+}
+
+.inputoutput {
+	width: 100%;
+}
+
+.input {
+	width: 50%;
+	padding: 5px;
+}
+.output {
+	width: 50%;
+	padding: 5px;
 }
