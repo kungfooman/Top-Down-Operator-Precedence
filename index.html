@@ -4,10 +4,15 @@
 		<title>Top Down Operator Precedence</title>
 		<link rel="stylesheet" href="bootstrap.min.css">
 		<link rel="stylesheet" href="style.css">
+		
+		<script src="hook.js"></script>
+		<script src="PrettyPrintHTML.js"></script>
+		<script src="HTML.js"></script>
+		
 	</head>
 
 	<body>
-		<h1><a href="http://javascript.crockford.com/tdop/tdop.html">Vaughan Pratt's Top Down Operator Precedence</a></h1>
+		<h1><a href="readme.html">Vaughan Pratt's Top Down Operator Precedence</a></h1>
 
 		<br><hr><br>
 		<h2>MiniJS</h2>
@@ -35,7 +40,7 @@
 		<script src="minijs_tokens.js"></script>
 		<script src="minijs_parse.js"></script>
 		<pre id="minijs_output"></pre>
-		<script src="interface_minijs.js"></script>
+		<script src="minijs_interface.js"></script>
 
 
 		<br><hr><br>
@@ -78,13 +83,11 @@ PrettyPrint(1,2)
 			<tr>
 		</table>
 
-		<script src="hook.js"></script>
-		<script src="interface_calculator.js"></script>
-		<script src="lexer.js"></script>
-		<script src="parser.js"></script>
-		<script src="evaluator.js"></script>
-		<script src="PrettyPrintHTML.js"></script>
-		<script src="HTML.js"></script>
+
+		<script src="calc_interface.js"></script>
+		<script src="calc_lexer.js"></script>
+		<script src="calc_parser.js"></script>
+		<script src="calc_evaluator.js"></script>
 
 		<!--
 		<button onclick="clearCanvas()">Clear Canvas</button>
