@@ -84,13 +84,17 @@ function calc_tokentable() {
 	var tokens = lex(input);
 	calc_parser = new Parser(tokens);
 	calc_parser.init();
-	//parser.parse();
+	//calc_parser.parse();
 	//print(PrettyPrintHTML(calc_parser.parseTree, 0));
 	
 	var html = new HTML().table().tr().td("type").td("value").td("lbp").td("inf<br>rbp").td("pre<br>rbp");
 	for (i in tokens) {
 		t = tokens[i];
 		sym = calc_parser.symbols[t.type];
+		if (sym == undefined) {
+			console.log("Undefined symbol: ", t, t.type);
+			continue;
+		}
 		html.tr();
 		html.td(t.type);
 		html.td(t.value || "");
