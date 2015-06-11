@@ -20,7 +20,7 @@ function MiniJS_Parser() {
             }
             this.def[n.value] = n;
             n.reserved = false;
-            n.nud      = itself;
+            n.symbolCallback      = itself;
             n.led      = null;
             n.std      = null;
             n.lbp      = 0;
@@ -108,7 +108,7 @@ function MiniJS_Parser() {
         var left;
         var t = token;
         advance();
-        left = t.nud();
+        left = t.symbolCallback();
         while (rbp < token.lbp) {
             t = token;
             advance();
@@ -154,7 +154,7 @@ function MiniJS_Parser() {
     };
 
     var original_symbol = {
-        nud: function () {
+        symbolCallback: function () {
             this.error("Undefined.");
         },
         led: function (left) {
@@ -180,7 +180,7 @@ function MiniJS_Parser() {
 
     var constant = function (s, v) {
         var x = symbol(s);
-        x.nud = function () {
+        x.symbolCallback = function () {
             scope.reserve(this);
             this.value = symbol_table[this.id].value;
             this.arity = "literal";
@@ -225,9 +225,9 @@ function MiniJS_Parser() {
         });
     };
 
-    var prefix = function (id, nud) {
+    var prefix = function (id, symbolCallback) {
         var s = symbol(id);
-        s.nud = nud || function () {
+        s.symbolCallback = symbolCallback || function () {
             scope.reserve(this);
             this.first = expression(70);
             this.arity = "unary";
@@ -259,9 +259,9 @@ function MiniJS_Parser() {
     constant("Object", {});
     constant("Array", []);
 
-    symbol("(literal)").nud = itself;
+    symbol("(literal)").symbolCallback = itself;
 
-    symbol("this").nud = function () {
+    symbol("this").symbolCallback = function () {
         scope.reserve(this);
         this.arity = "this";
         return this;

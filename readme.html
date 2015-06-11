@@ -94,10 +94,10 @@ syntax.</p>
 <pre>var symbol_table = {};</pre>
 <p>The <code>original_symbol</code> object is the prototype for all other
   symbols. Its methods will usually be overridden. (We will describe the
-  role of <code>nud</code> and <code>led</code> and binding powers in the
+  role of <code>symbolCallback</code> and <code>led</code> and binding powers in the
   section on Precedence below). </p>
 <pre>var original_symbol = {
-    nud: function () {
+    symbolCallback: function () {
         this.error("Undefined.");
     },
     led: function (left) {
@@ -236,7 +236,7 @@ defined in a scope are not visible outside of the scope.</p>
         }
         this.def[n.value] = n;
         n.reserved = false;
-        n.nud      = itself;
+        n.symbolCallback      = itself;
         n.led      = null;
         n.std      = null;
         n.lbp      = 0;
@@ -338,14 +338,14 @@ instance of the original scope prototype.</p>
 <p>Ultimately, the complexity in the process of parsing comes down to the
   resolution of this ambiguity. The technique we will develop here uses
   token objects whose members include binding powers (or precedence levels),
-  and simple methods called <code>nud</code> (null denotation) and <code>led</code>
-  (left denotation). A <code>nud</code> does not care about the tokens to
-  the left. A <code>led</code> does. A <code> nud</code> method is used
+  and simple methods called <code>symbolCallback</code> (null denotation) and <code>led</code>
+  (left denotation). A <code>symbolCallback</code> does not care about the tokens to
+  the left. A <code>led</code> does. A <code> symbolCallback</code> method is used
   by values (such as variables and literals) and by prefix operators. A
   <code>led</code> method is used by infix operators and suffix operators.
-  A token may have both a <code>nud</code> method and a <code> led</code>
+  A token may have both a <code>symbolCallback</code> method and a <code> led</code>
   method. For example, <code>-</code> might be both a prefix operator (negation)
-  and an infix operator (subtraction), so it would have both <code>nud</code>
+  and an infix operator (subtraction), so it would have both <code>symbolCallback</code>
   and <code>led</code> methods. </p>
 <p>In our parser, we will use these binding powers:</p>
 <style>
@@ -401,7 +401,7 @@ instance of the original scope prototype.</p>
     var left;
     var t = token;
     advance();
-    left = t.nud();
+    left = t.symbolCallback();
     while (rbp &lt; token.lbp) {
         t = token;
         advance();
@@ -410,13 +410,13 @@ instance of the original scope prototype.</p>
     return left;
 }</pre>
 
-<p><code>expression</code> calls the <code>nud</code> method of the
-<code>token</code>. The <code>nud</code> is used to process literals,
+<p><code>expression</code> calls the <code>symbolCallback</code> method of the
+<code>token</code>. The <code>symbolCallback</code> is used to process literals,
 variables, and prefix operators. Then as long as the right binding
 power is less than the left binding power of the next token, the
 <code>led</code> method is invoked on the following token. The <code>led</code> is used
 to process infix and suffix operators. This process can be recursive
-because the <code>nud</code> and <code>led</code> methods
+because the <code>symbolCallback</code> and <code>led</code> methods
 can call <code>expression</code>.</p>
 
 <h2>Infix Operators</h2>
@@ -552,9 +552,9 @@ infixr("||", 30);</pre>
   does not have a left binding power because it does not bind to the left.
   Prefix operators can also sometimes be reserved words.</p>
 
-<pre>var prefix = function (id, nud) {
+<pre>var prefix = function (id, symbolCallback) {
     var s = symbol(id);
-    s.nud = nud || function () {
+    s.symbolCallback = symbolCallback || function () {
         scope.reserve(this);
         this.first = expression(70);
         this.arity = "unary";
@@ -566,9 +566,9 @@ infixr("||", 30);</pre>
 prefix("!");
 prefix("typeof");</pre>
 
-<p>The <code>nud</code> of <code>(</code> will call <code>advance(")")</code>
+<p>The <code>symbolCallback</code> of <code>(</code> will call <code>advance(")")</code>
   to match a balancing <code>)</code> token. The <code>(</code> token does
-  not become part of the parse tree because the <code>nud</code> returns
+  not become part of the parse tree because the <code>symbolCallback</code> returns
   the inner expression. </p>
 
 <pre>prefix("(", function () {
@@ -610,12 +610,12 @@ and <code>infixr</code> returns the result of calling <code>symbol</code>.</p>
 <h2>Constants</h2>
 
 <p>The <code>constant</code>
-function builds constants into the language. The <code>nud</code> mutates a name token into a literal
+function builds constants into the language. The <code>symbolCallback</code> mutates a name token into a literal
 token.</p>
 
 <pre>var constant = function (s, v) {
     var x = symbol(s);
-    x.nud = function () {
+    x.symbolCallback = function () {
         scope.reserve(this);
         this.value = symbol_table[this.id].value;
         this.arity = "literal";
@@ -631,10 +631,10 @@ constant("null", null);</pre>
 
 <pre>constant("pi", 3.141592653589793);</pre>
 <p>The <code>(literal)</code> symbol is the prototype for all string and
-  number literals. The <code>nud</code> method of a literal token returns
+  number literals. The <code>symbolCallback</code> method of a literal token returns
   the token itself.</p>
 
-<pre>symbol("(literal)").nud = itself;</pre>
+<pre>symbol("(literal)").symbolCallback = itself;</pre>
 
 
 <h2>Statements</h2>
@@ -643,7 +643,7 @@ constant("null", null);</pre>
   everything is an expression. Most mainstream languages have statements
   that are not as nestable as expressions. We can easily handle statements
   by adding another method to tokens, the <code>std</code> (statement denotation).
-  A <code>std</code> is like a <code>nud</code> except that it is used only
+  A <code>std</code> is like a <code>symbolCallback</code> except that it is used only
   at the beginning of a statement.</p>
 
 <p>The <code>statement</code> function parses one statement. If the current
@@ -880,7 +880,7 @@ expressions that cannot possibly be function values.</p>
 <p>The <code>this</code> symbol is a special variable. In a method invocation,
   it is the reference to the object. </p>
 
-<pre>symbol("this").nud = function () {
+<pre>symbol("this").symbolCallback = function () {
     scope.reserve(this);
     this.arity = "this";
     return this;
