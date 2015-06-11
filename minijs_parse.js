@@ -104,12 +104,12 @@ function MiniJS_Parser() {
         return token;
     };
 
-    var expression = function (rbp) {
+    var expression = function (rightBindingPower) {
         var left;
         var t = token;
         advance();
         left = t.symbolCallback();
-        while (rbp < token.leftBindingPower) {
+        while (rightBindingPower < token.leftBindingPower) {
             t = token;
             advance();
             left = t.infixCallback(left);

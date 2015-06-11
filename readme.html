@@ -397,12 +397,12 @@ instance of the original scope prototype.</p>
   It takes a right binding power that controls how aggressively it binds
   to tokens on its right. </p>
 
-<pre>var expression = function (rbp) {
+<pre>var expression = function (rightBindingPower) {
     var left;
     var t = token;
     advance();
     left = t.symbolCallback();
-    while (rbp &lt; token.leftBindingPower) {
+    while (rightBindingPower &lt; token.leftBindingPower) {
         t = token;
         advance();
         left = t.infixCallback(left);
