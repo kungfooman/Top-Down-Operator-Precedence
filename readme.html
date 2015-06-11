@@ -114,17 +114,17 @@ syntax.</p>
   an <code>id</code>, a value, a left binding power, and the stuff it inherits
   from the <code>original_symbol</code>. </p>
 
-<pre>var symbol = function (id, bp) {
+<pre>var symbol = function (id, bindingPower) {
     var s = symbol_table[id];
-    bp = bp || 0;
+    bindingPower = bindingPower || 0;
     if (s) {
-        if (bp &gt;= s.leftBindingPower) {
-            s.leftBindingPower = bp;
+        if (bindingPower &gt;= s.leftBindingPower) {
+            s.leftBindingPower = bindingPower;
         }
     } else {
         s = Object.create(original_symbol);
         s.id = s.value = id;
-        s.leftBindingPower = bp;
+        s.leftBindingPower = bindingPower;
         symbol_table[id] = s;
     }
     return s;
@@ -452,11 +452,11 @@ can call <code>expression</code>.</p>
   function. If a <code>infixCallback</code> function is not provided, the <code>infix</code>
   function supplies a default <code>infixCallback</code> that is useful in most cases.</p>
 
-<pre>var infix = function (id, bp, infixCallback) {
-    var s = symbol(id, bp);
+<pre>var infix = function (id, bindingPower, infixCallback) {
+    var s = symbol(id, bindingPower);
     s.infixCallback = infixCallback || function (left) {
         this.first = left;
-        this.second = expression(bp);
+        this.second = expression(bindingPower);
         this.arity = "binary";
         return this;
     };
@@ -523,11 +523,11 @@ by a closing <code>]</code>.</p>
   operators, such as short-circuiting logical operators, by reducing the
   right binding power.</p>
 
-<pre>var infixr = function (id, bp, infixCallback) {
-    var s = symbol(id, bp);
+<pre>var infixr = function (id, bindingPower, infixCallback) {
+    var s = symbol(id, bindingPower);
     s.infixCallback = infixCallback || function (left) {
         this.first = left;
-        this.second = expression(bp - 1);
+        this.second = expression(bindingPower - 1);
         this.arity = "binary";
         return this;
     };

@@ -162,17 +162,17 @@ function MiniJS_Parser() {
         }
     };
 
-    var symbol = function (id, bp) {
+    var symbol = function (id, bindingPower) {
         var s = symbol_table[id];
-        bp = bp || 0;
+        bindingPower = bindingPower || 0;
         if (s) {
-            if (bp >= s.leftBindingPower) {
-                s.leftBindingPower = bp;
+            if (bindingPower >= s.leftBindingPower) {
+                s.leftBindingPower = bindingPower;
             }
         } else {
             s = Object.create(original_symbol);
             s.id = s.value = id;
-            s.leftBindingPower = bp;
+            s.leftBindingPower = bindingPower;
             symbol_table[id] = s;
         }
         return s;
@@ -190,22 +190,22 @@ function MiniJS_Parser() {
         return x;
     };
 
-    var infix = function (id, bp, infixCallback) {
-        var s = symbol(id, bp);
+    var infix = function (id, bindingPower, infixCallback) {
+        var s = symbol(id, bindingPower);
         s.infixCallback = infixCallback || function (left) {
             this.first = left;
-            this.second = expression(bp);
+            this.second = expression(bindingPower);
             this.arity = "binary";
             return this;
         };
         return s;
     };
 
-    var infixr = function (id, bp, infixCallback) {
-        var s = symbol(id, bp);
+    var infixr = function (id, bindingPower, infixCallback) {
+        var s = symbol(id, bindingPower);
         s.infixCallback = infixCallback || function (left) {
             this.first = left;
-            this.second = expression(bp - 1);
+            this.second = expression(bindingPower - 1);
             this.arity = "binary";
             return this;
         };
