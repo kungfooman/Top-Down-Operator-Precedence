@@ -23,7 +23,7 @@ function MiniJS_Parser() {
             n.symbolCallback      = itself;
             n.infixCallback      = null;
             n.std      = null;
-            n.lbp      = 0;
+            n.leftBindingPower      = 0;
             n.scope    = scope;
             return n;
         },
@@ -109,7 +109,7 @@ function MiniJS_Parser() {
         var t = token;
         advance();
         left = t.symbolCallback();
-        while (rbp < token.lbp) {
+        while (rbp < token.leftBindingPower) {
             t = token;
             advance();
             left = t.infixCallback(left);
@@ -166,13 +166,13 @@ function MiniJS_Parser() {
         var s = symbol_table[id];
         bp = bp || 0;
         if (s) {
-            if (bp >= s.lbp) {
-                s.lbp = bp;
+            if (bp >= s.leftBindingPower) {
+                s.leftBindingPower = bp;
             }
         } else {
             s = Object.create(original_symbol);
             s.id = s.value = id;
-            s.lbp = bp;
+            s.leftBindingPower = bp;
             symbol_table[id] = s;
         }
         return s;

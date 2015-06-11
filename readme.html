@@ -118,13 +118,13 @@ syntax.</p>
     var s = symbol_table[id];
     bp = bp || 0;
     if (s) {
-        if (bp &gt;= s.lbp) {
-            s.lbp = bp;
+        if (bp &gt;= s.leftBindingPower) {
+            s.leftBindingPower = bp;
         }
     } else {
         s = Object.create(original_symbol);
         s.id = s.value = id;
-        s.lbp = bp;
+        s.leftBindingPower = bp;
         symbol_table[id] = s;
     }
     return s;
@@ -239,7 +239,7 @@ defined in a scope are not visible outside of the scope.</p>
         n.symbolCallback      = itself;
         n.infixCallback      = null;
         n.std      = null;
-        n.lbp      = 0;
+        n.leftBindingPower      = 0;
         n.scope    = scope;
         return n;
     },</pre>
@@ -402,7 +402,7 @@ instance of the original scope prototype.</p>
     var t = token;
     advance();
     left = t.symbolCallback();
-    while (rbp &lt; token.lbp) {
+    while (rbp &lt; token.leftBindingPower) {
         t = token;
         advance();
         left = t.infixCallback(left);
