@@ -21,7 +21,7 @@ function MiniJS_Parser() {
             this.def[n.value] = n;
             n.reserved = false;
             n.symbolCallback      = itself;
-            n.led      = null;
+            n.infixCallback      = null;
             n.std      = null;
             n.lbp      = 0;
             n.scope    = scope;
@@ -112,7 +112,7 @@ function MiniJS_Parser() {
         while (rbp < token.lbp) {
             t = token;
             advance();
-            left = t.led(left);
+            left = t.infixCallback(left);
         }
         return left;
     };
@@ -157,7 +157,7 @@ function MiniJS_Parser() {
         symbolCallback: function () {
             this.error("Undefined.");
         },
-        led: function (left) {
+        infixCallback: function (left) {
             this.error("Missing operator.");
         }
     };
@@ -190,9 +190,9 @@ function MiniJS_Parser() {
         return x;
     };
 
-    var infix = function (id, bp, led) {
+    var infix = function (id, bp, infixCallback) {
         var s = symbol(id, bp);
-        s.led = led || function (left) {
+        s.infixCallback = infixCallback || function (left) {
             this.first = left;
             this.second = expression(bp);
             this.arity = "binary";
@@ -201,9 +201,9 @@ function MiniJS_Parser() {
         return s;
     };
 
-    var infixr = function (id, bp, led) {
+    var infixr = function (id, bp, infixCallback) {
         var s = symbol(id, bp);
-        s.led = led || function (left) {
+        s.infixCallback = infixCallback || function (left) {
             this.first = left;
             this.second = expression(bp - 1);
             this.arity = "binary";
