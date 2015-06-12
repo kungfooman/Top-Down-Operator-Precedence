@@ -56,6 +56,15 @@ function minijs_PrettyPrintHTML(node, depth)
 	if (typeof node == "undefined")
 		return "null";
 
+	// rewrite an array as statements-node
+	if (typeof node.length != "undefined") {
+		console.log(node)
+		node = {
+			id: "statements",
+			statements: node
+		}
+	}
+	
 	switch (node.id) {
 		case "statements": {
 			html.table("class=prettyprinthtml");
@@ -79,7 +88,8 @@ function minijs_PrettyPrintHTML(node, depth)
 		case "/":
 		case "%":
 		case "^":
-		case "=": {
+		case "=":
+		case "while": {
 			html.table("class=prettyprinthtml");
 			html.tr();
 			html.td(node.value, "colspan=2");
