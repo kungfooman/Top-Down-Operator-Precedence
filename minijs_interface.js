@@ -39,6 +39,13 @@ function minijs_parse() {
 function minijs_prettyprint() {
 	minijs_parser = new MiniJS_Parser();
 	tree = minijs_parser.parse(minijs_input());
+	if (typeof tree.length != "undefined")
+	{
+		tree = {
+			id: "statements",
+			statements: tree			
+		}
+	}
 	minijs_print(minijs_PrettyPrintHTML(tree, 0));
 };
 
