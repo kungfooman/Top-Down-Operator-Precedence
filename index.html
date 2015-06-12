@@ -4,11 +4,7 @@
 		<title>Top Down Operator Precedence</title>
 		<link rel="stylesheet" href="bootstrap.min.css">
 		<link rel="stylesheet" href="style.css">
-		
-		<script src="hook.js"></script>
-		<script src="PrettyPrintHTML.js"></script>
-		<script src="HTML.js"></script>
-		
+		<!-- scripts are at end to circumvent onload fuckery -->
 	</head>
 
 	<body>
@@ -61,6 +57,8 @@
 			<a name="minijs"></a>
 			<h2>MiniJS</h2>
 			<button onclick="minijs_parse()">Parse to JSON</button>
+			<button onclick="minijs_clear()">Clear</button>
+			<button onclick="minijs_prettyprint()">PrettyPrint</button>
 		</center>
 		<br>
 		
@@ -76,10 +74,6 @@ var a = 1 + 2;
 					<pre id="minijs_output"></pre>
 			<tr>
 		</table>
-		
-		<script src="minijs_tokens.js"></script>
-		<script src="minijs_parse.js"></script>
-		<script src="minijs_interface.js"></script>
 
 		<hr>
 
@@ -124,11 +118,6 @@ PrettyPrint(1,2)
 					<pre id="output"></pre>
 			<tr>
 		</table>
-
-		<script src="calc_interface.js"></script>
-		<script src="calc_lexer.js"></script>
-		<script src="calc_parser.js"></script>
-		<script src="calc_evaluator.js"></script>
 
 		<!--
 		<button onclick="clearCanvas()">Clear Canvas</button>
@@ -1111,6 +1100,19 @@ demonstration of the parser that was described in this paper.</a></p>
 <p>Another example of this parsing technique
 can be found in <a href="http://jslint.com/">JSLint</a>.</p>		
 		
+		
+		<script src="hook.js"></script>
+		<script src="PrettyPrintHTML.js"></script>
+		<script src="HTML.js"></script>
+		
+		<script src="minijs_tokens.js"></script>
+		<script src="minijs_parse.js"></script>
+		<script src="minijs_interface.js"></script>
+		
+		<script src="calc_interface.js"></script>
+		<script src="calc_lexer.js"></script>
+		<script src="calc_parser.js"></script>
+		<script src="calc_evaluator.js"></script>
 		
 	</body>
 </html>
