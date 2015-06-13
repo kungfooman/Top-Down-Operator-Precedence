@@ -384,7 +384,10 @@ var MiniJS = new function() {
 					a.push(s);
 				}
 			}
-			return a.length === 0 ? null : a.length === 1 ? a[0] : a;
+			return a.length === 0 ? null : {
+				id: "statements",
+				statements: a
+			};
 		};
 
 		var block = function () {
@@ -771,15 +774,6 @@ var MiniJS = new function() {
 
 		if (typeof node == "undefined")
 			return "null";
-
-		// rewrite an array as statements-node
-		if (typeof node.length != "undefined") {
-			console.log(node)
-			node = {
-				id: "statements",
-				statements: node
-			}
-		}
 		
 		switch (node.id) {
 			case "statements": {

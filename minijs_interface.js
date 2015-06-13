@@ -40,13 +40,6 @@ function minijs_prettyprint() {
 	try {
 		minijs_parser = new MiniJS.Parser();
 		tree = minijs_parser.parse(minijs_input());
-		if (typeof tree.length != "undefined")
-		{
-			tree = {
-				id: "statements",
-				statements: tree			
-			}
-		}
 		minijs_print(MiniJS.PrettyPrintHTML(tree, 0));
 	} catch (e) {
 		console.log("Exception: ", e);
