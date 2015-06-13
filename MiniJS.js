@@ -1,7 +1,7 @@
 
-var MiniJS = {
+var MiniJS = new function() {
 	
-	Lexer: function(input, prefix, suffix) {
+	var Lexer = this.Lexer = function(input, prefix, suffix) {
 		// Produce an array of simple token objects from a string.
 		// A simple token object contains these members:
 		//      type: 'name', 'string', 'number', 'operator'
@@ -237,9 +237,9 @@ var MiniJS = {
 			}
 		}
 		this.result = result;
-	},
+	} // function Lexer
 	
-	Parser: function() {
+	var Parser = this.Parser = function() {
 		var scope;
 		var symbol_table = {};
 		var token;
@@ -754,7 +754,7 @@ var MiniJS = {
 		});
 
 		this.parse = function (source) {
-			tokens = new MiniJS.Lexer(source, '=<>!+-*&|/%^', '=<>&|').result;
+			tokens = new Lexer(source, '=<>!+-*&|/%^', '=<>&|').result;
 			token_nr = 0;
 			new_scope();
 			advance();
@@ -763,9 +763,9 @@ var MiniJS = {
 			scope.pop();
 			return s;
 		};
-	},
+	} // function Parser
 	
-	PrettyPrintHTML: function(node, depth)
+	var PrettyPrintHTML = this.PrettyPrintHTML = function(node, depth)
 	{
 		var html = new HTML();
 
@@ -789,7 +789,7 @@ var MiniJS = {
 					html.tr();
 					//html.td("node.statements[" + i + "]");
 					html.td("#" + i);
-					html.td(MiniJS.PrettyPrintHTML(node.statements[i], depth + 1));
+					html.td(PrettyPrintHTML(node.statements[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -811,8 +811,8 @@ var MiniJS = {
 				html.tr();
 				html.td(node.value, "colspan=2");
 				html.tr();
-				html.td(MiniJS.PrettyPrintHTML(node.first, depth + 1));
-				html.td(MiniJS.PrettyPrintHTML(node.second, depth + 1));
+				html.td(PrettyPrintHTML(node.first, depth + 1));
+				html.td(PrettyPrintHTML(node.second, depth + 1));
 				return html.toString();
 			}
 			
@@ -824,7 +824,7 @@ var MiniJS = {
 				for (var i = 0; i < node.args.length; i++) {
 					html.tr();
 					html.td("args #" + i);
-					html.td(MiniJS.PrettyPrintHTML(node.args[i], depth + 1));
+					html.td(PrettyPrintHTML(node.args[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -840,7 +840,7 @@ var MiniJS = {
 					html.td(node.first[i].value);
 				}
 				html.tr();
-				html.td(MiniJS.PrettyPrintHTML(node.second, depth + 1), "colspan=2");
+				html.td(PrettyPrintHTML(node.second, depth + 1), "colspan=2");
 				return html.toString();
 			}
 			
@@ -856,7 +856,7 @@ var MiniJS = {
 				html.tr();
 				html.td("return");
 				html.tr();
-				html.td(MiniJS.PrettyPrintHTML(node.first, depth + 1));
+				html.td(PrettyPrintHTML(node.first, depth + 1));
 				return html.toString();
 			}
 			
@@ -889,5 +889,5 @@ var MiniJS = {
 				
 				return html.toString();
 		}
-	}
+	} // function HTMLPrettyPrint
 };
