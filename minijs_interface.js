@@ -37,16 +37,21 @@ function minijs_parse() {
 };
 
 function minijs_prettyprint() {
-	minijs_parser = new MiniJS_Parser();
-	tree = minijs_parser.parse(minijs_input());
-	if (typeof tree.length != "undefined")
-	{
-		tree = {
-			id: "statements",
-			statements: tree			
+	try {
+		minijs_parser = new MiniJS_Parser();
+		tree = minijs_parser.parse(minijs_input());
+		if (typeof tree.length != "undefined")
+		{
+			tree = {
+				id: "statements",
+				statements: tree			
+			}
 		}
+		minijs_print(minijs_PrettyPrintHTML(tree, 0));
+	} catch (e) {
+		console.log("Exception: ", e);
+		
 	}
-	minijs_print(minijs_PrettyPrintHTML(tree, 0));
 };
 
 function minijs_PrettyPrintHTML(node, depth)
@@ -68,6 +73,7 @@ function minijs_PrettyPrintHTML(node, depth)
 	switch (node.id) {
 		case "statements": {
 			html.table("class=prettyprinthtml");
+			html.tr().td("statements", "colspan=2");
 			for (var i = 0; i < node.statements.length; i++) {
 				html.tr();
 				//html.td("node.statements[" + i + "]");
@@ -103,7 +109,7 @@ function minijs_PrettyPrintHTML(node, depth)
 			html.table("class=prettyprinthtml");
 			html.tr();
 			html.td("call");
-			html.td(node.name);
+			html.td(node.id);
 			for (var i = 0; i < node.args.length; i++) {
 				html.tr();
 				html.td("args #" + i);
@@ -115,15 +121,15 @@ function minijs_PrettyPrintHTML(node, depth)
 		case "function": {
 			html.table("class=prettyprinthtml");
 			html.tr();
-			html.td("function");
-			html.td(node.name);
-			for (var i = 0; i < node.args.length; i++) {
+			//html.td("function");
+			html.td(node.id, "colspan=2");
+			for (var i = 0; i < node.first.length; i++) {
 				html.tr();
 				html.td("args #" + i);
-				html.td(node.args[i].value);
+				html.td(node.first[i].value);
 			}
 			html.tr();
-			html.td(minijs_PrettyPrintHTML(node.value, depth + 1), "colspan=2");
+			html.td(minijs_PrettyPrintHTML(node.second, depth + 1), "colspan=2");
 			return html.toString();
 		}
 		
@@ -132,6 +138,14 @@ function minijs_PrettyPrintHTML(node, depth)
 			html.tr();
 			//html.td("name");
 			html.td(node.value);
+			return html.toString();
+		}
+		case "return": {
+			html.table("class=prettyprinthtml");
+			html.tr();
+			html.td("return");
+			html.tr();
+			html.td(minijs_PrettyPrintHTML(node.first, depth + 1));
 			return html.toString();
 		}
 		
