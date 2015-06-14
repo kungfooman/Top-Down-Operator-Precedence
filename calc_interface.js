@@ -16,7 +16,7 @@ var Calc = new function() {
 			return textarea.value.substring(s,e);
 		}
 		var calculate = this.calculate = function() {
-			var tokens = Lexer(getInput());
+			var tokens = new Lexer(getInput()).tokens;
 			//var parseTree = parse(tokens);
 			calc_parser = new Parser(tokens);
 			//calc_parser.infix = hookLog(calc_parser, calc_parser.infix, "infix");
@@ -29,7 +29,7 @@ var Calc = new function() {
 			print("\nStatement evaluations: \n" + output);
 		}
 		var prettyPrint = this.prettyPrint = function() {
-			var tokens = Lexer(getInput());
+			var tokens = new Lexer(getInput()).tokens;
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
 			calc_parser.parse();
@@ -38,13 +38,13 @@ var Calc = new function() {
 		var prettyPrintSelection = this.prettyPrintSelection = function() {
 			var input = getSelectedInput();
 			print("Selection: <div class=selection>" + input + "</div>"); // todo: put in getInput() and print if "[ ] Only Selection" is marked
-			calc_parser = new Parser(Lexer(input));
+			calc_parser = new Parser(new Lexer(input).tokens);
 			calc_parser.init();
 			calc_parser.parse();
 			Calc.prettyPrint(calc_parser.parseTree, 0);
 		}
 		var prettyPrintHTML = this.prettyPrintHTML = function() {
-			calc_parser = new Parser(Lexer(getInput()));
+			calc_parser = new Parser(new Lexer(getInput()).tokens);
 			calc_parser.init();
 			calc_parser.parse();
 			print(Calc.prettyPrintHTML(calc_parser.parseTree, 0));
@@ -52,7 +52,7 @@ var Calc = new function() {
 		var tokenTable = this.tokenTable = function() {
 			var input = getSelectedInput();
 			print("Selection: <div class=selection>" + input + "</div>");
-			var tokens = Lexer(input);
+			var tokens = new Lexer(input).tokens;
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
 			//calc_parser.parse();
@@ -62,7 +62,7 @@ var Calc = new function() {
 		var parseStepSelection = this.parseStepSelection = function() {
 			var input = getInput();
 			print("Selection: <div class=selection>" + input + "</div>");
-			var tokens = Lexer(input);
+			var tokens = new Lexer(input).tokens;
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
 			var html = new HTML().table().tr().td("type").td("value").td("lbp").td("inf<br>rbp").td("pre<br>rbp");
@@ -332,6 +332,6 @@ var Calc = new function() {
 			else throw "Unrecognized token.";
 		}
 		addToken("(end)");
-		return tokens;
-	} // function Lexer
+		this.tokens = tokens;
+	} // class Lexer
 }
