@@ -46,3 +46,9 @@ td {
 	width: 50%;
 	padding: 5px;
 }
+.prettyprint_key {
+	color: green;
+}
+.prettyprint_value {
+	color: red;
+}
