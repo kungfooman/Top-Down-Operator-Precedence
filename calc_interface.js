@@ -3,7 +3,7 @@ var Calc = new function() {
 		var print = this.print = function(msg) {
 			document.getElementById("calc_output").innerHTML += msg + "\n";
 		}
-		var Clear = this.Clear = function() {
+		var clear = this.clear = function() {
 			document.getElementById("calc_output").innerHTML = "";
 		}
 		var getInput = this.getInput = function() {
@@ -15,7 +15,7 @@ var Calc = new function() {
 			var e = textarea.selectionEnd;
 			return textarea.value.substring(s,e);
 		}
-		var Calculate = this.Calculate = function() {
+		var calculate = this.calculate = function() {
 			var tokens = Lexer(getInput());
 			//var parseTree = parse(tokens);
 			calc_parser = new Parser(tokens);
@@ -28,58 +28,43 @@ var Calc = new function() {
 			var output = evaluate(calc_parser.parseTree);
 			print("\nStatement evaluations: \n" + output);
 		}
-		var PrettyPrint = this.PrettyPrint = function() {
+		var prettyPrint = this.prettyPrint = function() {
 			var tokens = Lexer(getInput());
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
 			calc_parser.parse();
-			Calc.PrettyPrint(calc_parser.parseTree, 0);
+			Calc.prettyPrint(calc_parser.parseTree, 0);
 		}
-		var PrettyPrintSelection = this.PrettyPrintSelection = function() {
+		var prettyPrintSelection = this.prettyPrintSelection = function() {
 			var input = getSelectedInput();
-			print("Selection: <div class=selection>" + input + "</div>");
-			
-			
-			var tokens = Lexer(input);
-			calc_parser = new Parser(tokens);
+			print("Selection: <div class=selection>" + input + "</div>"); // todo: put in getInput() and print if "[ ] Only Selection" is marked
+			calc_parser = new Parser(Lexer(input));
 			calc_parser.init();
 			calc_parser.parse();
-			Calc.PrettyPrint(calc_parser.parseTree, 0);
+			Calc.prettyPrint(calc_parser.parseTree, 0);
 		}
-		var PrettyPrintHTML = this.PrettyPrintHTML = function() {
-			var input = getInput();
-			//print("Selection: <div class=selection>" + input + "</div>");
-			
-			
-			var tokens = Lexer(input);
-			calc_parser = new Parser(tokens);
-			 
+		var prettyPrintHTML = this.prettyPrintHTML = function() {
+			calc_parser = new Parser(Lexer(getInput()));
 			calc_parser.init();
 			calc_parser.parse();
-			print(Calc.PrettyPrintHTML(calc_parser.parseTree, 0));
+			print(Calc.prettyPrintHTML(calc_parser.parseTree, 0));
 		}
-		var TokenTable = this.TokenTable = function() {
+		var tokenTable = this.tokenTable = function() {
 			var input = getSelectedInput();
 			print("Selection: <div class=selection>" + input + "</div>");
-			//print("Selection: <div class=selection>" + input + "</div>");
-
-
 			var tokens = Lexer(input);
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
 			//calc_parser.parse();
 			//print(PrettyPrintHTML(calc_parser.parseTree, 0));
-
 			print("Tokens: " + tokens.length)
 		}
-		var ParseStepSelection = this.ParseStepSelection = function() {
+		var parseStepSelection = this.parseStepSelection = function() {
 			var input = getInput();
-			//print("Selection: <div class=selection>" + input + "</div>");
+			print("Selection: <div class=selection>" + input + "</div>");
 			var tokens = Lexer(input);
 			calc_parser = new Parser(tokens);
 			calc_parser.init();
-			//calc_parser.parse();
-			//print(PrettyPrintHTML(calc_parser.parseTree, 0));
 			var html = new HTML().table().tr().td("type").td("value").td("lbp").td("inf<br>rbp").td("pre<br>rbp");
 			for (i in tokens) {
 				t = tokens[i];
@@ -105,7 +90,7 @@ var Calc = new function() {
 		}
 	} // namespace Interface
 	
-	var PrettyPrintHTML = this.PrettyPrintHTML = function(node, depth) {
+	var prettyPrintHTML = this.prettyPrintHTML = function(node, depth) {
 		var html = new HTML();
 
 		if (typeof node == "undefined")
@@ -118,7 +103,7 @@ var Calc = new function() {
 					html.tr();
 					//html.td("node.statements[" + i + "]");
 					html.td("#" + i);
-					html.td(PrettyPrintHTML(node.statements[i], depth + 1));
+					html.td(prettyPrintHTML(node.statements[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -137,8 +122,8 @@ var Calc = new function() {
 				html.tr();
 				html.td(node.type, "colspan=2");
 				html.tr();
-				html.td(PrettyPrintHTML(node.left, depth + 1));
-				html.td(PrettyPrintHTML(node.right, depth + 1));
+				html.td(prettyPrintHTML(node.left, depth + 1));
+				html.td(prettyPrintHTML(node.right, depth + 1));
 				return html.toString();
 			}
 
@@ -148,7 +133,7 @@ var Calc = new function() {
 				html.td("=", "colspan=2");
 				html.tr();
 				html.td(node.name);
-				html.td(PrettyPrintHTML(node.value, depth + 1));
+				html.td(prettyPrintHTML(node.value, depth + 1));
 				return html.toString();
 			}
 			
@@ -160,7 +145,7 @@ var Calc = new function() {
 				for (var i = 0; i < node.args.length; i++) {
 					html.tr();
 					html.td("args #" + i);
-					html.td(PrettyPrintHTML(node.args[i], depth + 1));
+					html.td(prettyPrintHTML(node.args[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -176,7 +161,7 @@ var Calc = new function() {
 					html.td(node.args[i].value);
 				}
 				html.tr();
-				html.td(PrettyPrintHTML(node.value, depth + 1), "colspan=2");
+				html.td(prettyPrintHTML(node.value, depth + 1), "colspan=2");
 				return html.toString();
 			}
 			
@@ -220,14 +205,14 @@ var Calc = new function() {
 	} // function PrettyPrintHTML
 	
 	
-	var PrettyPrint = this.PrettyPrint = function(node, depth) {
+	var prettyPrint = this.prettyPrint = function(node, depth) {
 		var indent = "PrettyPrint> " + "  ".repeat(depth);
 		
 		switch (node.type) {
 			case "call_": {
 				Interface.print(indent + "node.type=" + node.type + " node.name=" + node.name);
 				for (var i = 0; i < node.args.length; i++) {
-					PrettyPrint(node.args[i], depth + 1);
+					prettyPrint(node.args[i], depth + 1);
 				}
 				break;
 			}
@@ -259,23 +244,23 @@ var Calc = new function() {
 				}
 				if (typeof node.left != "undefined") {
 					Interface.print(indent + "node.left:");
-					PrettyPrint(node.left, depth + 1);
+					prettyPrint(node.left, depth + 1);
 				}
 				if (typeof node.right != "undefined") {
 					Interface.print(indent + "node.right:");
-					PrettyPrint(node.right, depth + 1);
+					prettyPrint(node.right, depth + 1);
 				}
 				if (typeof node.args != "undefined") {
 					Interface.print(indent + "node.args:");
 					for (var i = 0; i < node.args.length; i++) {
-						PrettyPrint(node.args[i], depth + 1);
+						prettyPrint(node.args[i], depth + 1);
 					}
 				}
 				if (typeof node.statements != "undefined") {
 					Interface.print(indent + "node.statements:");
 					for (var i = 0; i < node.statements.length; i++) {
 						Interface.print(indent + "node.statement["+ i +"]:");
-						PrettyPrint(node.statements[i], depth + 1);
+						prettyPrint(node.statements[i], depth + 1);
 					}
 				}
 				break;
@@ -284,13 +269,13 @@ var Calc = new function() {
 	} // function PrettyPrint
 	
 	var Lexer = this.Lexer = function(input) {
-		// PrettyPrinterLex(Lexer("\"test\""));
-		function PrettyPrinterLex(tokens)
+		// prettyPrinterLex(Lexer("\"test\""));
+		function prettyPrinterLex(tokens)
 		{
 			for (var i=0; i<tokens.length; i++)
 			{
 				t = tokens[i];
-				print("token.type=" + t.type + " token.value=" + t.value);
+				Interface.print("token.type=" + t.type + " token.value=" + t.value);
 			}
 		}
 

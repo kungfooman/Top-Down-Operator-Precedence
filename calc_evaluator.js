@@ -59,7 +59,13 @@ var evaluate = function (parseTree) {
 			if (node.name == "PrettyPrint")
 			{
 				//console.log("Some prettyprinter....")
-				Calc.PrettyPrint(node, 0);
+				Calc.prettyPrint(node, 0);
+				return 1;
+			}
+			if (node.name == "PrettyPrintHTML")
+			{
+				console.log("Some prettyprinter....")
+				Calc.prettyPrintHTML(node, 0);
 				return 1;
 			}
 			for (var i = 0; i < node.args.length; i++)
