@@ -91,13 +91,13 @@ var funky = function(arg1, arg2) {
 		<center>
 			<a name="calc"></a>
 			<h2>Calculator</h2>
-			<button onclick="calc_calculate()">Calculate</button>
-			<button onclick="calc_prettyprint()">PrettyPrint</button>
-			<button onclick="calc_clear()">Clear</button>
-			<button onclick="calc_prettyprintselection()">PrettyPrint Selection</button>
-			<button onclick="calc_prettyprinthtml()">PrettyPrintHTML</button>
-			<button onclick="calc_tokentable()">TokenTable</button>
-			<button onclick="calc_parsestepselection()">ParseStepSelection</button>
+			<button onclick="Calc.Interface.Calculate()">Calculate</button>
+			<button onclick="Calc.Interface.PrettyPrint()">PrettyPrint</button>
+			<button onclick="Calc.Interface.Clear()">Clear</button>
+			<button onclick="Calc.Interface.PrettyPrintSelection()">PrettyPrint Selection</button>
+			<button onclick="Calc.Interface.PrettyPrintHTML()">PrettyPrintHTML</button>
+			<button onclick="Calc.Interface.TokenTable()">TokenTable</button>
+			<button onclick="Calc.Interface.ParseStepSelection()">ParseStepSelection</button>
 		</center>
 		<br>
 		<table class="inputoutput">
@@ -126,7 +126,7 @@ PrettyPrint(1,2)
 					</textarea>
 				<td class="output">
 					<center><h3><code>Output</code></h3></center>
-					<pre id="output"></pre>
+					<pre id="calc_output"></pre>
 			<tr>
 		</table>
 

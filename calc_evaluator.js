@@ -59,7 +59,7 @@ var evaluate = function (parseTree) {
 			if (node.name == "PrettyPrint")
 			{
 				//console.log("Some prettyprinter....")
-				PrettyPrint(node, 0);
+				Calc.PrettyPrint(node, 0);
 				return 1;
 			}
 			for (var i = 0; i < node.args.length; i++)
@@ -86,65 +86,3 @@ var evaluate = function (parseTree) {
 	return output;
 };
 
-function PrettyPrint(node, depth)
-{
-	var indent = "PrettyPrint> " + "  ".repeat(depth);
-	
-	switch (node.type) {
-		case "call_": {
-			print(indent + "node.type=" + node.type + " node.name=" + node.name);
-			for (var i = 0; i < node.args.length; i++) {
-				PrettyPrint(node.args[i], depth + 1);
-			}
-			break;
-		}
-		case "number_": {
-			print(indent + "node.type=" + node.type + " node.value=" + node.value);
-			break;
-		}
-		
-		default:
-			nonewline = function(msg) { return msg.replace(/\r\n/g, " ").replace(/\n/g, " "); }
-			tmp = "";
-			for (key in node) {
-				if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
-					continue;
-				tmp += "<b class=prettyprinttext>node." + key + "</b>=<b class=prettyprinttext>" + node[key] + "</b> ";
-			}
-			print(indent + nonewline(tmp));
-			if (typeof node.symbol != "undefined") {
-				print(indent + "node.symbol:");
-				
-				tmp = "";
-				for (key in node.symbol) {
-					if (key == "args" || key == "left" || key == "right" || key == "symbol") // will be printed separately
-						continue;
-					tmp += "<b class=prettyprinttext>node." + key + "</b>=<b class=prettyprinttext>" + node[key] + "</b> ";
-				}
-				print(indent + nonewline(tmp));
-				
-			}
-			if (typeof node.left != "undefined") {
-				print(indent + "node.left:");
-				PrettyPrint(node.left, depth + 1);
-			}
-			if (typeof node.right != "undefined") {
-				print(indent + "node.right:");
-				PrettyPrint(node.right, depth + 1);
-			}
-			if (typeof node.args != "undefined") {
-				print(indent + "node.args:");
-				for (var i = 0; i < node.args.length; i++) {
-					PrettyPrint(node.args[i], depth + 1);
-				}
-			}
-			if (typeof node.statements != "undefined") {
-				print(indent + "node.statements:");
-				for (var i = 0; i < node.statements.length; i++) {
-					print(indent + "node.statement["+ i +"]:");
-					PrettyPrint(node.statements[i], depth + 1);
-				}
-			}
-			break;
-	}
-}
