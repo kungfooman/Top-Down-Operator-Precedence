@@ -6,6 +6,14 @@ Object.prototype.error = function (message, t) {
 	throw t;
 };
 
+// A bit shitty, because in prettyPrint the data is only "text",
+// so we need some text-ID to point to reaccess the scope later.
+// Need to convert it to HTML and use jQuery e.g. later.
+scopes = [];
+scopesOnclick = function(id) {
+	console.log("Scope: ", scopes[id]);
+}
+
 var MiniJS = new function() {
 
 	var Interface = this.Interface = new function() {
@@ -37,10 +45,23 @@ var MiniJS = new function() {
 		}
 
 		var prettyPrint = this.prettyPrint = function() {
+			scopes = []; // reset scopes
 			try {
 				minijs_parser = new MiniJS.Parser();
 				tree = minijs_parser.parse(input());
-				print(MiniJS.PrettyPrintHTML(tree, 0));
+				print(MiniJS.prettyPrint(tree, 0));
+			} catch (e) {
+				console.log("Exception: ", e);
+				
+			}
+		}
+
+		var prettyPrintHTML = this.prettyPrintHTML = function() {
+			scopes = []; // reset scopes
+			try {
+				minijs_parser = new MiniJS.Parser();
+				tree = minijs_parser.parse(input());
+				print(MiniJS.prettyPrintHTML(tree, 0));
 			} catch (e) {
 				console.log("Exception: ", e);
 				
@@ -792,7 +813,7 @@ var MiniJS = new function() {
 		};
 	} // function Parser
 	
-	var PrettyPrintHTML = this.PrettyPrintHTML = function(node, depth)
+	var prettyPrintHTML = this.prettyPrintHTML = function(node, depth)
 	{
 		var html = new HTML();
 
@@ -807,7 +828,7 @@ var MiniJS = new function() {
 					html.tr();
 					//html.td("node.statements[" + i + "]");
 					html.td("#" + i);
-					html.td(PrettyPrintHTML(node.statements[i], depth + 1));
+					html.td(prettyPrintHTML(node.statements[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -829,8 +850,8 @@ var MiniJS = new function() {
 				html.tr();
 				html.td(node.value, "colspan=2");
 				html.tr();
-				html.td(PrettyPrintHTML(node.first, depth + 1));
-				html.td(PrettyPrintHTML(node.second, depth + 1));
+				html.td(prettyPrintHTML(node.first, depth + 1));
+				html.td(prettyPrintHTML(node.second, depth + 1));
 				return html.toString();
 			}
 			
@@ -842,7 +863,7 @@ var MiniJS = new function() {
 				for (var i = 0; i < node.args.length; i++) {
 					html.tr();
 					html.td("args #" + i);
-					html.td(PrettyPrintHTML(node.args[i], depth + 1));
+					html.td(prettyPrintHTML(node.args[i], depth + 1));
 				}
 				return html.toString();
 			}
@@ -858,7 +879,7 @@ var MiniJS = new function() {
 					html.td(node.first[i].value);
 				}
 				html.tr();
-				html.td(PrettyPrintHTML(node.second, depth + 1), "colspan=2");
+				html.td(prettyPrintHTML(node.second, depth + 1), "colspan=2");
 				return html.toString();
 			}
 			
@@ -874,7 +895,7 @@ var MiniJS = new function() {
 				html.tr();
 				html.td("return");
 				html.tr();
-				html.td(PrettyPrintHTML(node.first, depth + 1));
+				html.td(prettyPrintHTML(node.first, depth + 1));
 				return html.toString();
 			}
 			
@@ -902,31 +923,38 @@ var MiniJS = new function() {
 		}
 		
 		// possible types: number, string, object, function, ...?
-		beautifyKey = function(msg) {
-			if (typeof msg == "function") {
-				var tmp = msg.toString().replace(/\r\n/g, " ").replace(/\n/g, " ").replace(/\t/g, " ").replace(/  /g, " ");
+		beautifyKey = function(key, value) {
+			if (typeof value == "function") {
+				var tmp = value.toString().replace(/\r\n/g, " ").replace(/\n/g, " ").replace(/\t/g, " ").replace(/  /g, " ");
 				return tmp.substring(0,tmp.indexOf(")") + 1);
 			}
-			if (typeof msg == "string")
-				return msg.replace(/\r\n/g, " ").replace(/\n/g, " ");
-			return msg;
+			if (typeof value == "string")
+				value = value.replace(/\r\n/g, " ").replace(/\n/g, " ");
+			if (key == "scope") {
+				scopes.push(value);
+				value = "<button onclick='scopesOnclick(" + (scopes.length - 1) + ")'>SCOPE</button>";
+			}
+			return value;
 		}
 		
 		txt += indent;
 		for (key in node) {
-			if (key == "first" || key == "second" || key == "third" || key == "fourth") // will be printed separately
+			if (key == "statements" || key == "first" || key == "second" || key == "third" || key == "fourth") // will be printed separately
 				continue;
-			txt += ("<b class=prettyprint_key>node." + key + "</b>=<b class=prettyprint_value>" + beautifyKey(node[key]) + "</b> ");
+			txt += ("<b class=prettyprint_key>node." + key + "</b>=<b class=prettyprint_value>" + beautifyKey(key, node[key]) + "</b> ");
 		}
 
 		if (typeof node.first != "undefined")
-			txt += (indent + "node.first : " + prettyPrint(node.first,  depth + 1) + "\n");
+			txt += (indent + "node.first: "  + prettyPrint(node.first,  depth + 1) + "\n");
 		if (typeof node.second != "undefined")
 			txt += (indent + "node.second: " + prettyPrint(node.second, depth + 1) + "\n");
 		if (typeof node.third != "undefined")
-			txt += (indent + "node.third : " + prettyPrint(node.third,  depth + 1) + "\n");
+			txt += (indent + "node.third: "  + prettyPrint(node.third,  depth + 1) + "\n");
 		if (typeof node.fourth != "undefined")
 			txt += (indent + "node.fourth: " + prettyPrint(node.fourth, depth + 1) + "\n");
+		
+		if (typeof node.statements  != "undefined")
+			txt += (indent + "node.statements: " + prettyPrint(node.statements , depth + 1) + "\n");
 		
 		// add as many fucking newlines as you want, here we gonna replace successive ones with a single one
 		txt = "\n" + txt + "\n";
