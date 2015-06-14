@@ -1,5 +1,52 @@
+// Transform a token object into an exception object and throw it.
+Object.prototype.error = function (message, t) {
+	t = t || this;
+	t.name = "SyntaxError";
+	t.message = message;
+	throw t;
+};
 
 var MiniJS = new function() {
+
+	var Interface = this.Interface = new function() {
+		var print = this.print = function(string) {
+			document.getElementById('minijs_output').innerHTML += string;
+		}
+		var clear = this.clear = function() {
+			document.getElementById('minijs_output').innerHTML = "";
+		}
+		var input = this.input = function() {
+			return document.getElementById('minijs_input').value;
+		}
+
+		var go = this.go = function(source) {
+			var string, tree;
+			try {
+				minijs_parser = new MiniJS.Parser();
+				tree = minijs_parser.parse(source);
+				string = JSON.stringify(tree, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements"], 4);
+			} catch (e) {
+				string = JSON.stringify(e, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements"], 4);
+			}
+			print(string);
+		}
+
+		var parseToJSON = this.parseToJSON = function() {
+			//minijs_go("var MiniJS_Parser = " + MiniJS_Parser.toSource() + ";");
+			go(input());
+		}
+
+		var prettyPrint = this.prettyPrint = function() {
+			try {
+				minijs_parser = new MiniJS.Parser();
+				tree = minijs_parser.parse(input());
+				print(MiniJS.PrettyPrintHTML(tree, 0));
+			} catch (e) {
+				console.log("Exception: ", e);
+				
+			}
+		}
+	} // namespace Interface
 	
 	var Lexer = this.Lexer = function(input, prefix, suffix) {
 		// Produce an array of simple token objects from a string.
@@ -8,9 +55,7 @@ var MiniJS = new function() {
 		//      value: string or number value of the token
 		//      from: index of first character of the token
 		//      to: index of the last character + 1
-
 		// Comments of the // type are ignored.
-
 		// Operators are by default single characters. Multicharacter
 		// operators can be made by supplying a string of prefix and
 		// suffix characters.
@@ -18,7 +63,6 @@ var MiniJS = new function() {
 		//      '<>+-&', '=>&:'
 		// will match any of these:
 		//      <=  >>  >>>  <>  >=  +: -: &: &&: &&
-
 		var c;                      // The current character.
 		var from;                   // The index of the start of the token.
 		var i = 0;                  // The index of the current character.
@@ -26,11 +70,8 @@ var MiniJS = new function() {
 		var n;                      // The number value.
 		var q;                      // The quote character.
 		var str;                    // The string value.
-
 		var result = [];            // An array to hold the results.
-
 		var make = function (type, value) {
-
 			// Make a token object.
 			return {
 				type: type,
@@ -39,11 +80,9 @@ var MiniJS = new function() {
 				to: i
 			};
 		};
-
 		// Begin tokenization. If the source string is empty, return nothing.
 		if (!input)
 			return;
-
 		// If prefix and suffix strings are not provided, supply defaults.
 		if (typeof prefix !== 'string') {
 			prefix = '<>+-&';
@@ -51,17 +90,14 @@ var MiniJS = new function() {
 		if (typeof suffix !== 'string') {
 			suffix = '=>&:';
 		}
-
 		// Loop through this text, one character at a time.
 		c = input.charAt(i);
 		while (c) {
 			from = i;
-
 			// Ignore whitespace.
 			if (c <= ' ') {
 				i += 1;
 				c = input.charAt(i);
-
 			// name.
 			} else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
 				str = c;
@@ -77,13 +113,11 @@ var MiniJS = new function() {
 					}
 				}
 				result.push(make('name', str));
-
 			// number.
 			// A number cannot start with a decimal point. It must start with a digit, possibly '0'.
 			} else if (c >= '0' && c <= '9') {
 				str = c;
 				i += 1;
-
 				// Look for more digits.
 				for (;;) {
 					c = input.charAt(i);
@@ -93,7 +127,6 @@ var MiniJS = new function() {
 					i += 1;
 					str += c;
 				}
-
 				// Look for a decimal fraction part.
 				if (c === '.') {
 					i += 1;
@@ -107,7 +140,6 @@ var MiniJS = new function() {
 						str += c;
 					}
 				}
-
 				// Look for an exponent part.
 				if (c === 'e' || c === 'E') {
 					i += 1;
@@ -127,14 +159,12 @@ var MiniJS = new function() {
 						c = input.charAt(i);
 					} while (c >= '0' && c <= '9');
 				}
-
 				// Make sure the next character is not a letter.
 				if (c >= 'a' && c <= 'z') {
 					str += c;
 					i += 1;
 					make('number', str).error("Bad number");
 				}
-
 				// Convert the string value to a number. If it is finite, then it is a good token.
 				n = +str;
 				if (isFinite(n)) {
@@ -142,7 +172,6 @@ var MiniJS = new function() {
 				} else {
 					make('number', str).error("Bad number");
 				}
-
 			// string
 			} else if (c === '\'' || c === '"') {
 				str = '';
@@ -155,12 +184,10 @@ var MiniJS = new function() {
 							"Unterminated string." :
 							"Control character in string.", make('', str));
 					}
-
 					// Look for the closing quote.
 					if (c === q) {
 						break;
 					}
-
 					// Look for escapement.
 					if (c === '\\') {
 						i += 1;
@@ -203,7 +230,6 @@ var MiniJS = new function() {
 				i += 1;
 				result.push(make('string', str));
 				c = input.charAt(i);
-
 			// comment.
 			} else if (c === '/' && input.charAt(i + 1) === '/') {
 				i += 1;
@@ -214,7 +240,6 @@ var MiniJS = new function() {
 					}
 					i += 1;
 				}
-
 			// combining
 			} else if (prefix.indexOf(c) >= 0) {
 				str = c;
@@ -228,7 +253,6 @@ var MiniJS = new function() {
 					i += 1;
 				}
 				result.push(make('operator', str));
-
 			// single-character operator
 			} else {
 				i += 1;
