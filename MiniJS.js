@@ -67,6 +67,18 @@ var MiniJS = new function() {
 				
 			}
 		}
+
+		var prettyPrintFull = this.prettyPrintFull = function() {
+			scopes = []; // reset scopes
+			try {
+				minijs_parser = new MiniJS.Parser();
+				tree = minijs_parser.parse(input());
+				print(MiniJS.prettyPrintFull(tree, 0));
+			} catch (e) {
+				console.log("Exception: ", e);
+				
+			}
+		}
 	} // namespace Interface
 	
 	var Lexer = this.Lexer = function(input, prefix, suffix) {
@@ -955,6 +967,65 @@ var MiniJS = new function() {
 		
 		if (typeof node.statements  != "undefined")
 			txt += (indent + "node.statements: " + prettyPrint(node.statements , depth + 1) + "\n");
+		
+		// add as many fucking newlines as you want, here we gonna replace successive ones with a single one
+		txt = "\n" + txt + "\n";
+		if (depth == 0)
+			txt = "<div style='text-align: left'><pre>" + txt.replace(/\n+/g, "\n");
+		return txt;
+	}
+	var prettyPrintFull = this.prettyPrintFull = function(node, depth, prefix) {
+		if (typeof prefix == "undefined")
+			prefix = "";
+		
+		if (typeof node == "undefined")
+			return "null";
+		
+		var indent = "\nPrettyPrint> " + "  ".repeat(depth);
+		var txt = "\n";
+		
+		if (typeof node.length != "undefined") {
+			for (var i=0; i<node.length; i++)
+			{
+				txt += (indent + "array[" + i + "]: " + "\n");
+				txt += (prettyPrintFull(node[i], depth + 1));
+			}
+			return txt;
+		}
+		
+		// possible types: number, string, object, function, ...?
+		beautifyKey = function(key, value) {
+			if (typeof value == "function") {
+				var tmp = value.toString().replace(/\r\n/g, " ").replace(/\n/g, " ").replace(/\t/g, " ").replace(/  /g, " ");
+				return tmp.substring(0,tmp.indexOf(")") + 1);
+			}
+			if (typeof value == "string")
+				value = value.replace(/\r\n/g, " ").replace(/\n/g, " ");
+			if (key == "scope") {
+				scopes.push(value);
+				value = "<button onclick='scopesOnclick(" + (scopes.length - 1) + ")'>SCOPE</button>";
+			}
+			return value;
+		}
+		
+		txt += indent;
+		for (key in node) {
+			if (key == "statements" || key == "first" || key == "second" || key == "third" || key == "fourth") // will be printed separately
+				continue;
+			txt += ("<b class=prettyprint_key>node." + key + "</b>=<b class=prettyprint_value>" + beautifyKey(key, node[key]) + "</b> ");
+		}
+
+		if (typeof node.first != "undefined")
+			txt += (indent + "node.first: "  + prettyPrintFull(node.first,  depth + 1) + "\n");
+		if (typeof node.second != "undefined")
+			txt += (indent + "node.second: " + prettyPrintFull(node.second, depth + 1) + "\n");
+		if (typeof node.third != "undefined")
+			txt += (indent + "node.third: "  + prettyPrintFull(node.third,  depth + 1) + "\n");
+		if (typeof node.fourth != "undefined")
+			txt += (indent + "node.fourth: " + prettyPrintFull(node.fourth, depth + 1) + "\n");
+		
+		if (typeof node.statements  != "undefined")
+			txt += (indent + "node.statements: " + prettyPrintFull(node.statements , depth + 1) + "\n");
 		
 		// add as many fucking newlines as you want, here we gonna replace successive ones with a single one
 		txt = "\n" + txt + "\n";
