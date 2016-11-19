@@ -19,7 +19,7 @@
 					<li><a href="#javascript">JavaScript</a>
 					<li><a href="#symboltable">Symbol Table</a>
 					<li><a href="#tokens">Tokens</a>
-					<li><a href="#scope">Scope</a>
+					<li><a href="#html_scope">Scope</a>
 					<li><a href="#precedence">Precedence</a>
 					<li><a href="#expressions">Expressions</a>
 					<li><a href="#infixoperators">Infix Operators</a>
@@ -345,8 +345,8 @@ symbol("(name)");</pre>
     return token;
 };</pre>
 
-<a name="scope"></a>
-<h2 id="scope">Scope</h2>
+<a name="html_scope"></a>
+<h2 id="html_scope">Scope</h2>
 
 <p>Most languages have some notation for defining new symbols (such as variable
   names). In a very simple language, when we encounter a new word, we might
@@ -1117,17 +1117,18 @@ demonstration of the parser that was described in this paper.</a></p>
 can be found in <a href="http://jslint.com/">JSLint</a>.</p>		
 		
 		
-		<script src="hook.js"></script>
-		<script src="PrettyPrintHTML.js"></script>
-		<script src="HTML.js"></script>
-		
-		<script src="MiniJS.js"></script>
-		<script src="minijs_interface.js"></script>
-		
-		<script src="calc_interface.js"></script>
-		<script src="calc_lexer.js"></script>
-		<script src="calc_parser.js"></script>
-		<script src="calc_evaluator.js"></script>
+		<script type="application/javascript" src="hook.js"></script>
+		<script type="application/javascript" src="PrettyPrintHTML.js"></script>
+		<script type="application/javascript" src="HTML.js"></script>
+		<!--<script type="application/javascript" src="c_scope.js"></script>-->
+		<script type="application/javascript" src="c_parser.js"></script>
+		<script type="application/javascript" src="c_lexer.js"></script>
+		<script type="application/javascript" src="MiniJS.js"></script>
+		<script type="application/javascript" src="minijs_interface.js"></script>
+		<script type="application/javascript" src="calc_interface.js"></script>
+		<script type="application/javascript" src="calc_lexer.js"></script>
+		<script type="application/javascript" src="calc_parser.js"></script>
+		<script type="application/javascript" src="calc_evaluator.js"></script>
 		
 	</body>
 </html>
