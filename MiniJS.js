@@ -32,9 +32,9 @@ var MiniJS = new function() {
 			try {
 				minijs_parser = new ParserJS();
 				tree = minijs_parser.parse(source);
-				string = JSON.stringify(tree, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements"], 4);
+				string = JSON.stringify(tree, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements", "type", "is_pointer"], 4);
 			} catch (e) {
-				string = JSON.stringify(e, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements"], 4);
+				string = JSON.stringify(e, ["id", 'key', 'name', 'message', 'value', 'arity', 'first', 'second', 'third', 'fourth', "statements", "type", "is_pointer"], 4);
 			}
 			print(string);
 		}
@@ -53,7 +53,7 @@ var MiniJS = new function() {
 			} catch (e) {
 				console.log("Exception: ", e.stack);
 				console.log("Exception: ", e);
-				
+
 			}
 		}
 
@@ -66,7 +66,7 @@ var MiniJS = new function() {
 			} catch (e) {
 				console.log("Exception: ", e.stack);
 				console.log("Exception: ", e);
-				
+
 			}
 		}
 
@@ -79,21 +79,21 @@ var MiniJS = new function() {
 			} catch (e) {
 				console.log("Exception: ", e.stack);
 				console.log("Exception: ", e);
-				
+
 			}
 		}
 	} // namespace Interface
-	
+
 	var Lexer = this.Lexer = LexerJS;
 	var Parser = this.Parser = ParserJS;
-	
+
 	var prettyPrintHTML = this.prettyPrintHTML = function(node, depth)
 	{
 		var html = new HTML();
 
 		if (typeof node == "undefined")
 			return "null";
-		
+
 		switch (node.id) {
 			case "statements": {
 				html.table("class=prettyprinthtml");
@@ -106,12 +106,12 @@ var MiniJS = new function() {
 				}
 				return html.toString();
 			}
-		
+
 			case "(literal)":
 			case "(name)": {
 				return node.value;
 			}
-			
+
 			case "+":
 			case "-":
 			case "*":
@@ -128,7 +128,7 @@ var MiniJS = new function() {
 				html.td(prettyPrintHTML(node.second, depth + 1));
 				return html.toString();
 			}
-			
+
 			case "call": {
 				html.table("class=prettyprinthtml");
 				html.tr();
@@ -141,7 +141,7 @@ var MiniJS = new function() {
 				}
 				return html.toString();
 			}
-			
+
 			case "function": {
 				html.table("class=prettyprinthtml");
 				html.tr();
@@ -156,7 +156,7 @@ var MiniJS = new function() {
 				html.td(prettyPrintHTML(node.second, depth + 1), "colspan=2");
 				return html.toString();
 			}
-			
+
 			case "identifier": {
 				html.table("class=prettyprinthtml");
 				html.tr();
@@ -172,21 +172,21 @@ var MiniJS = new function() {
 				html.td(prettyPrintHTML(node.first, depth + 1));
 				return html.toString();
 			}
-			
+
 			default:
 				return prettyPrint(node, 0);
 		}
 	} // function HTMLPrettyPrint
-	
+
 	var prettyPrint = this.prettyPrint = function(node, depth) {
-		
-		
+
+
 		if (typeof node == "undefined")
 			return "null";
-		
+
 		var indent = "\nPrettyPrint> " + "  ".repeat(depth);
 		var txt = "\n";
-		
+
 		if (typeof node.length != "undefined") {
 			for (var i=0; i<node.length; i++)
 			{
@@ -195,7 +195,7 @@ var MiniJS = new function() {
 			}
 			return txt;
 		}
-		
+
 		// possible types: number, string, object, function, ...?
 		beautifyKey = function(key, value) {
 			if (typeof value == "function") {
@@ -210,7 +210,7 @@ var MiniJS = new function() {
 			}
 			return value;
 		}
-		
+
 		txt += indent;
 		for (key in node) {
 			if (key == "statements" || key == "first" || key == "second" || key == "third" || key == "fourth") // will be printed separately
@@ -226,10 +226,10 @@ var MiniJS = new function() {
 			txt += (indent + "node.third: "  + prettyPrint(node.third,  depth + 1) + "\n");
 		if (typeof node.fourth != "undefined")
 			txt += (indent + "node.fourth: " + prettyPrint(node.fourth, depth + 1) + "\n");
-		
+
 		if (typeof node.statements  != "undefined")
 			txt += (indent + "node.statements: " + prettyPrint(node.statements , depth + 1) + "\n");
-		
+
 		// add as many fucking newlines as you want, here we gonna replace successive ones with a single one
 		txt = "\n" + txt + "\n";
 		if (depth == 0)
@@ -239,13 +239,13 @@ var MiniJS = new function() {
 	var prettyPrintFull = this.prettyPrintFull = function(node, depth, prefix) {
 		if (typeof prefix == "undefined")
 			prefix = "";
-		
+
 		if (typeof node == "undefined")
 			return "null";
-		
+
 		var indent = "\nPrettyPrint> " + "  ".repeat(depth);
 		var txt = "\n";
-		
+
 		if (typeof node.length != "undefined") {
 			for (var i=0; i<node.length; i++)
 			{
@@ -254,7 +254,7 @@ var MiniJS = new function() {
 			}
 			return txt;
 		}
-		
+
 		// possible types: number, string, object, function, ...?
 		beautifyKey = function(key, value) {
 			if (typeof value == "function") {
@@ -269,7 +269,7 @@ var MiniJS = new function() {
 			}
 			return value;
 		}
-		
+
 		txt += indent;
 		for (key in node) {
 			if (key == "statements" || key == "first" || key == "second" || key == "third" || key == "fourth") // will be printed separately
@@ -285,10 +285,10 @@ var MiniJS = new function() {
 			txt += (indent + "node.third: "  + prettyPrintFull(node.third,  depth + 1) + "\n");
 		if (typeof node.fourth != "undefined")
 			txt += (indent + "node.fourth: " + prettyPrintFull(node.fourth, depth + 1) + "\n");
-		
+
 		if (typeof node.statements  != "undefined")
 			txt += (indent + "node.statements: " + prettyPrintFull(node.statements , depth + 1) + "\n");
-		
+
 		// add as many fucking newlines as you want, here we gonna replace successive ones with a single one
 		txt = "\n" + txt + "\n";
 		if (depth == 0)

@@ -4,12 +4,12 @@ scopeid = 0;
 Scope = function(parser) {
 	this.id = scopeid++;
 	this.def = {};
-	
+
 	//console.log("scope", this);
-	
+
 	this.parent = parser.scope;
 	this.parser = parser;
-	
+
 	this.define = function (n) {
 		//console.log("Define in scope: ", this.id, "n: ", n);
 		var t = this.def[n.value];
@@ -70,34 +70,34 @@ ParserJS = function() {
 		var symbol_table = {};
 		var token;
 		var token_nr;
-		
+
 		this.eval = function(str) { return eval(str); }
 
-		
-		
-		
+
+
+
 		var itself = function () {
 			//console.log("this of itself is: ", this); // original_symbol
 			return this;
 		};
 
-		
+
 		this.symbol_table = symbol_table;
 		this.token = token;
 		this.token_nr = token_nr;
 		this.itself = itself;
-		
+
 		var parser = undefined;
-		
-		
+
+
 		this.parse = function (source) {
 			this.tokens = new LexerJS(source, '=<>!+-*&|/%^', '=<>&|').result;
 			token_nr = 0;
-			
+
 			parser = this;
-		
+
 			this.scope = new Scope(this);
-			
+
 			//console.log("scope: ", scope);
 			//console.log("this.scope: ", this.scope);
 			//console.log("parser.scope: ", parser.scope);
@@ -110,12 +110,12 @@ ParserJS = function() {
 
 		var advance = function (id) {
 			var a, o, t, v;
-			
-			
+
+
 			//console.log("advance id=", id);
-			
+
 			if (id && token.id !== id) {
-				token.error("Expected '" + id + "'.");
+				token.error("Expected '" + id + "', but got '"+token.id+"'");
 			}
 			if (token_nr >= parser.tokens.length) {
 				token = symbol_table["(end)"];
@@ -169,7 +169,10 @@ ParserJS = function() {
 			}
 			v = expression(0);
 			if (!v.assignment && v.id !== "(") {
-				v.error("Bad expression statement.");
+				if (v.id !== "struct") {
+					console.log("Bad expression, v.id is", v.id);
+					v.error("Bad expression statement.");
+				}
 			}
 			advance(";");
 			return v;
@@ -201,7 +204,7 @@ ParserJS = function() {
 		function original_symbol(id, bindingPower) {
 			this.id = this.value = id;
 			this.leftBindingPower = bindingPower;
-			
+
 			this.symbolCallback = function () {
 				this.error("Undefined.");
 			};
@@ -300,6 +303,8 @@ ParserJS = function() {
 		symbol("}");
 		symbol(",");
 		symbol("else");
+
+		//symbol("struct");
 
 		constant("true", true);
 		constant("false", false);
@@ -456,6 +461,123 @@ ParserJS = function() {
 			return this;
 		});
 
+
+
+
+		stmt("int", function () {
+			var a = [], n, t;
+
+
+			function NodeType(type, name, is_pointer) {
+				this.type = type;
+				this.name = name;
+				this.is_pointer = is_pointer;
+
+			}
+
+			console.log("ok do the int stuff");
+
+			while (true) {
+				n = token;
+
+				// .arity="name" .id="int" .value="int"
+				// .arity="name" .id="(name)" .value="muhahi"
+				var type = token.value;
+
+				advance();
+				var name = token.value;
+
+				advance(); // should be ";", but doesnt work as parameter
+
+
+				console.log("Arity is: ", token);
+
+
+
+				//advance(); // the }
+				//advance(); // the ;
+				console.log("Last Arity is: ", token);
+				return new NodeType(type, name, 0);
+
+				//if (n.arity !== "name") {
+				//	n.error("Expected a new variable name.");
+				//}
+
+				console.log("Add new name to scope", n);
+				parser.scope.define(n);
+				advance();
+				if (token.id === "=") {
+					t = token;
+					advance("=");
+					t.first = n;
+					t.second = expression(0);
+					t.arity = "binary";
+					a.push(t);
+				}
+				if (token.id !== ",") {
+					break;
+				}
+				advance(",");
+			}
+			advance(";");
+			return a.length === 0 ? null : a.length === 1 ? a[0] : a;
+		});
+		prefix("struct", function () {
+			var a = [];
+
+			console.log("Struct name: ", token.id, token.value);
+
+			// skip token.id=="(name)"
+			advance();
+
+			// skip {
+			advance("{");
+
+			if (token.id !== "}") {
+				while (true) {
+
+					var e = undefined;
+					try {
+						console.log("lets check what we got...", token);
+
+						//throw "whatthefuck";
+						type = token.std();
+						a.push(type);
+						console.log("Got type: ", type);
+
+						//console.log("Got token 1:", token);
+						//advance();
+						//console.log("Got token 2:", token);
+
+						//e = block();
+					} catch (e) {
+						console.log("Could not get expression", e, e.stack);
+						break;
+					}
+					console.log("Expression: ", e);
+					//a.push(e);
+					if (token.id !== ",") {
+						break;
+					}
+					advance(",");
+				}
+			}
+			if (a.length == 0) {
+
+				console.log("m8 that struct is empty :S");
+			}
+
+			advance(";"); // int foo";"
+			advance("}");
+			console.log("current token: ", token); // is ;
+
+			this.first = a;
+			this.arity = "unary";
+
+			console.log("PREFIX struct: ", a);
+			return this;
+		});
+
 		prefix("{", function () {
 			var a = [], n, v;
 			if (token.id !== "}") {
@@ -561,7 +683,7 @@ ParserJS = function() {
 			this.arity = "statement";
 			return this;
 		});
-		
+
 		stmt("foowhile", function () {
 			advance("(");
 			this.first = expression(0);
