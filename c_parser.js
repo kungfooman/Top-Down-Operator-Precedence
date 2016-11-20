@@ -476,28 +476,51 @@ ParserJS = function() {
 			}
 
 			console.log("ok do the int stuff");
+			var members = [];
 
 			while (true) {
 				n = token;
 
 				// .arity="name" .id="int" .value="int"
 				// .arity="name" .id="(name)" .value="muhahi"
+				// .arity="operator" .id="*" .value="*"
 				var type = token.value;
 
+				console.log("Advance 1 token: ", token);
 				advance();
+
+				var is_pointer = 0;
+				if (token.id == "*") {
+					is_pointer = 1;
+					advance();
+				}
+
+
 				var name = token.value;
 
+				console.log("Advance 2 token: ", token);
 				advance(); // should be ";", but doesnt work as parameter
 
 
-				console.log("Arity is: ", token);
+
 
 
 
 				//advance(); // the }
 				//advance(); // the ;
-				console.log("Last Arity is: ", token);
-				return new NodeType(type, name, 0);
+				console.log("Advance 3 token: ", token);
+				advance();
+
+				console.log("Advance 4 token: ", token);
+
+				//members.push();
+				if (token.arity == "}")
+					return new NodeType(type, name, is_pointer);
+				else {
+					return new NodeType(type, name, is_pointer);
+					advance();
+					continue;
+				}
 
 				//if (n.arity !== "name") {
 				//	n.error("Expected a new variable name.");
@@ -539,27 +562,23 @@ ParserJS = function() {
 					var e = undefined;
 					try {
 						console.log("lets check what we got...", token);
-
-						//throw "whatthefuck";
 						type = token.std();
 						a.push(type);
 						console.log("Got type: ", type);
 
-						//console.log("Got token 1:", token);
-						//advance();
-						//console.log("Got token 2:", token);
-
-						//e = block();
 					} catch (e) {
-						console.log("Could not get expression", e, e.stack);
+						console.log("Could not get a type", e, e.stack);
 						break;
 					}
-					console.log("Expression: ", e);
-					//a.push(e);
-					if (token.id !== ",") {
-						break;
+					if (token.id !== "}") {
+						console.log("we need to fetch another type");
+						console.log("Last token is", token);
+
+						continue;
 					}
-					advance(",");
+
+					break;
+					//advance();
 				}
 			}
 			if (a.length == 0) {
@@ -567,7 +586,7 @@ ParserJS = function() {
 				console.log("m8 that struct is empty :S");
 			}
 
-			advance(";"); // int foo";"
+			//advance(";"); // int foo";"
 			advance("}");
 			console.log("current token: ", token); // is ;
 
