@@ -1,8 +1,8 @@
 var globalparser = undefined;
 
-
+scopeid = 0;
 		Scope = function(parser, parent_scope) {
-			
+			this.id = scopeid++;
 			this.def = {};
 			
 			
@@ -62,7 +62,6 @@ var globalparser = undefined;
 		};
 
 ParserJS = function() {
-		var scope;
 		var symbol_table = {};
 		var token;
 		var token_nr;
@@ -73,7 +72,7 @@ ParserJS = function() {
 		
 		
 		var itself = function () {
-			console.log("this of itself is: ", this); // original_symbol
+			//console.log("this of itself is: ", this); // original_symbol
 			return this;
 		};
 
@@ -83,23 +82,40 @@ ParserJS = function() {
 		this.token_nr = token_nr;
 		this.itself = itself;
 		
+		var parser = undefined;
+		
 		globalparser = this;
 		
-
+		this.parse = function (source) {
+			this.tokens = new LexerJS(source, '=<>!+-*&|/%^', '=<>&|').result;
+			token_nr = 0;
+			
+		parser = this;
+		
+			parser.scope = new Scope(this, parser.scope);
+			
+			//console.log("scope: ", scope);
+			console.log("this.scope: ", this.scope);
+			console.log("parser.scope: ", parser.scope);
+			advance();
+			var s = statements();
+			advance("(end)");
+			parser.scope.pop();
+			return s;
+		};
 
 		var new_scope = function () {
 			//var s = scope;
-			scope = new Scope(this, scope);
-			this.scope = scope;
+			console.log("PARSER IS: ", parser);
+			parser.scope = new Scope(this, parser.scope);
 
-			return scope;
 		};
 
 		var advance = function (id) {
 			var a, o, t, v;
 			
 			
-			console.log("advance id=", id);
+			//console.log("advance id=", id);
 			
 			if (id && token.id !== id) {
 				token.error("Expected '" + id + "'.");
@@ -113,7 +129,7 @@ ParserJS = function() {
 			v = t.value;
 			a = t.type;
 			if (a === "name") {
-				o = scope.find(v);
+				o = parser.scope.find(v);
 			} else if (a === "operator") {
 				o = symbol_table[v];
 				if (!o) {
@@ -151,7 +167,7 @@ ParserJS = function() {
 
 			if (n.std) {
 				advance();
-				scope.reserve(n);
+				parser.scope.reserve(n);
 				return n.std();
 			}
 			v = expression(0);
@@ -217,7 +233,7 @@ ParserJS = function() {
 		var constant = function (s, v) {
 			var x = symbol(s);
 			x.symbolCallback = function () {
-				scope.reserve(this);
+				parser.scope.reserve(this);
 				this.value = symbol_table[this.id].value;
 				this.arity = "literal";
 				return this;
@@ -264,7 +280,7 @@ ParserJS = function() {
 		var prefix = function (id, symbolCallback) {
 			var s = symbol(id);
 			s.symbolCallback = symbolCallback || function () {
-				scope.reserve(this);
+				parser.scope.reserve(this);
 				this.first = expression(70);
 				this.arity = "unary";
 				return this;
@@ -298,7 +314,7 @@ ParserJS = function() {
 		symbol("(literal)").symbolCallback = itself;
 
 		symbol("this").symbolCallback = function () {
-			scope.reserve(this);
+			parser.scope.reserve(this);
 			this.arity = "this";
 			return this;
 		};
@@ -397,7 +413,7 @@ ParserJS = function() {
 			var a = [];
 			new_scope();
 			if (token.arity === "name") {
-				scope.define(token);
+				parser.scope.define(token);
 				this.name = token.value;
 				advance();
 			}
@@ -407,7 +423,7 @@ ParserJS = function() {
 					if (token.arity !== "name") {
 						token.error("Expected a parameter name.");
 					}
-					scope.define(token);
+					parser.scope.define(token);
 					a.push(token);
 					advance();
 					if (token.id !== ",") {
@@ -422,7 +438,7 @@ ParserJS = function() {
 			this.second = statements();
 			advance("}");
 			this.arity = "function";
-			scope.pop();
+			parser.scope.pop();
 			return this;
 		});
 
@@ -473,7 +489,7 @@ ParserJS = function() {
 			new_scope();
 			var a = statements();
 			advance("}");
-			scope.pop();
+			parser.scope.pop();
 			return a;
 		});
 
@@ -484,7 +500,7 @@ ParserJS = function() {
 				if (n.arity !== "name") {
 					n.error("Expected a new variable name.");
 				}
-				scope.define(n);
+				parser.scope.define(n);
 				advance();
 				if (token.id === "=") {
 					t = token;
@@ -509,7 +525,7 @@ ParserJS = function() {
 			advance(")");
 			this.second = block();
 			if (token.id === "else") {
-				scope.reserve(token);
+				parser.scope.reserve(token);
 				advance("else");
 				this.third = token.id === "if" ? statement() : block();
 			} else {
@@ -558,14 +574,5 @@ ParserJS = function() {
 			return this;
 		});
 
-		this.parse = function (source) {
-			this.tokens = new LexerJS(source, '=<>!+-*&|/%^', '=<>&|').result;
-			token_nr = 0;
-			new_scope();
-			advance();
-			var s = statements();
-			advance("(end)");
-			scope.pop();
-			return s;
-		};
+
 	} // function Parser
