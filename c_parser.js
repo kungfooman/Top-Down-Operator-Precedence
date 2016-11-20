@@ -1,65 +1,70 @@
-var globalparser = undefined;
+
 
 scopeid = 0;
-		Scope = function(parser, parent_scope) {
-			this.id = scopeid++;
-			this.def = {};
-			
-			
-			//console.log("parent_scope is: ", parent_scope);
-			//console.log("parser.scope is: ", parser.scope);
-			
-			this.parent = parent_scope;
-			
-			this.define = function (n) {
-				var t = this.def[n.value];
-				if (typeof t === "object") {
-					n.error(t.reserved ? "Already reserved." : "Already defined.");
-				}
-				this.def[n.value] = n;
-				n.reserved = false;
-				console.log("original.scope this is: ", this);
-				n.symbolCallback      = globalparser.itself;
-				n.infixCallback      = null;
-				n.std      = null;
-				n.leftBindingPower      = 0;
-				n.scope    = globalparser.scope;
-				return n;
-			};
-			this.find = function (n) {
-				var e = this, o;
-				while (true) {
-					o = e.def[n];
-					if (o && typeof o !== 'function') {
-						return e.def[n];
-					}
-					e = e.parent;
-					if (!e) {
-						o = globalparser.symbol_table[n];
-						return o && typeof o !== 'function' ? o : globalparser.symbol_table["(name)"];
-					}
-				}
-			};
-			this.pop = function () {
-				globalparser.scope = this.parent;
-			};
-			this.reserve = function (n) {
-				if (n.arity !== "name" || n.reserved) {
-					return;
-				}
-				var t = this.def[n.value];
-				if (t) {
-					if (t.reserved) {
-						return;
-					}
-					if (t.arity === "name") {
-						n.error("Already defined.");
-					}
-				}
-				this.def[n.value] = n;
-				n.reserved = true;
-			};
-		};
+Scope = function(parser) {
+	this.id = scopeid++;
+	this.def = {};
+	
+	//console.log("scope", this);
+	
+	this.parent = parser.scope;
+	this.parser = parser;
+	
+	this.define = function (n) {
+		//console.log("Define in scope: ", this.id, "n: ", n);
+		var t = this.def[n.value];
+		if (typeof t === "object") {
+			n.error(t.reserved ? "Already reserved." : "Already defined.");
+		}
+		this.def[n.value] = n;
+		n.reserved = false;
+		//console.log("original.scope this is: ", this);
+		n.symbolCallback      = this.parser.itself;
+		n.infixCallback      = null;
+		n.std      = null;
+		n.leftBindingPower      = 0;
+		n.scope    = this.parser.scope;
+		return n;
+	};
+	this.find = function (n) {
+		var e = this, o;
+		while (true) {
+			o = e.def[n];
+			if (o && typeof o !== 'function') {
+				return e.def[n];
+			}
+			e = e.parent;
+			if (!e) {
+				o = this.parser.symbol_table[n];
+				return o && typeof o !== 'function' ? o : this.parser.symbol_table["(name)"];
+			}
+		}
+	};
+	this.pop = function () {
+		this.parser.scope = this.parent;
+	};
+	this.push = function () {
+		//this.parser.scope = this.parent;
+		this.parser.scope = new Scope(this.parser);
+	};
+	this.reserve = function (n) {
+		if (n.arity !== "name" || n.reserved) {
+			return;
+		}
+		var t = this.def[n.value];
+		if (t) {
+			if (t.reserved) {
+				return;
+			}
+			if (t.arity === "name") {
+				n.error("Already defined.");
+			}
+		}
+		this.def[n.value] = n;
+		n.reserved = true;
+	};
+};
+
 
 ParserJS = function() {
 		var symbol_table = {};
@@ -84,31 +89,23 @@ ParserJS = function() {
 		
 		var parser = undefined;
 		
-		globalparser = this;
 		
 		this.parse = function (source) {
 			this.tokens = new LexerJS(source, '=<>!+-*&|/%^', '=<>&|').result;
 			token_nr = 0;
 			
-		parser = this;
+			parser = this;
 		
-			parser.scope = new Scope(this, parser.scope);
+			this.scope = new Scope(this);
 			
 			//console.log("scope: ", scope);
-			console.log("this.scope: ", this.scope);
-			console.log("parser.scope: ", parser.scope);
+			//console.log("this.scope: ", this.scope);
+			//console.log("parser.scope: ", parser.scope);
 			advance();
 			var s = statements();
 			advance("(end)");
-			parser.scope.pop();
+			this.scope.pop();
 			return s;
-		};
-
-		var new_scope = function () {
-			//var s = scope;
-			console.log("PARSER IS: ", parser);
-			parser.scope = new Scope(this, parser.scope);
-
 		};
 
 		var advance = function (id) {
@@ -120,11 +117,11 @@ ParserJS = function() {
 			if (id && token.id !== id) {
 				token.error("Expected '" + id + "'.");
 			}
-			if (token_nr >= globalparser.tokens.length) {
+			if (token_nr >= parser.tokens.length) {
 				token = symbol_table["(end)"];
 				return;
 			}
-			t = globalparser.tokens[token_nr];
+			t = parser.tokens[token_nr];
 			token_nr += 1;
 			v = t.value;
 			a = t.type;
@@ -411,7 +408,7 @@ ParserJS = function() {
 
 		prefix("function", function () {
 			var a = [];
-			new_scope();
+			parser.scope.push();
 			if (token.arity === "name") {
 				parser.scope.define(token);
 				this.name = token.value;
@@ -486,7 +483,7 @@ ParserJS = function() {
 
 
 		stmt("{", function () {
-			new_scope();
+			parser.scope.push();
 			var a = statements();
 			advance("}");
 			parser.scope.pop();

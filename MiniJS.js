@@ -52,6 +52,7 @@ var MiniJS = new function() {
 				print(MiniJS.prettyPrint(tree, 0));
 			} catch (e) {
 				console.log("Exception: ", e.stack);
+				console.log("Exception: ", e);
 				
 			}
 		}
@@ -64,6 +65,7 @@ var MiniJS = new function() {
 				print(MiniJS.prettyPrintHTML(tree, 0));
 			} catch (e) {
 				console.log("Exception: ", e.stack);
+				console.log("Exception: ", e);
 				
 			}
 		}
@@ -76,6 +78,7 @@ var MiniJS = new function() {
 				print(MiniJS.prettyPrintFull(tree, 0));
 			} catch (e) {
 				console.log("Exception: ", e.stack);
+				console.log("Exception: ", e);
 				
 			}
 		}
